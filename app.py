@@ -164,6 +164,16 @@ def admin_logout():
     return redirect(url_for("index"))
 
 
+# ─── Statik Sayfalar ─────────────────────────────────────────
+@app.route("/gizlilik")
+def gizlilik():
+    return render_template("gizlilik.html")
+
+@app.route("/iletisim")
+def iletisim():
+    return render_template("iletisim.html")
+
+
 # ─── Seed Data ───────────────────────────────────────────────
 @app.route("/admin/seed")
 def seed():
