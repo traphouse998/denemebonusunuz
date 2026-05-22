@@ -173,10 +173,10 @@ def seed():
         flash("Veriler zaten mevcut")
         return redirect(url_for("admin_panel"))
     sites_data = [
-        {"name": "Betbom", "bonus_text": "500 TL Çevrimsiz Deneme + 50 Freespin", "promo_kod": "BETBOM500",
+        {"name": "Betbom", "bonus_text": "250 Freespin + 1000 TL Çekim İmkânı", "promo_kod": "BETBOM500",
          "affiliate_link": "https://www.denemebonuscuyuz.com", "kategori": "vip", "sira": 1,
-         "logo_url": "/static/images/betbom.png",
-         "aciklama": "En yüksek çevrimsiz deneme bonusu. Bizzat test ettim, anında ödüyor."},
+         "logo_url": "https://icons.betbom187.com/storage/medias/casinobom-18755870/content_18755870_4bdd36ac1b10a9693bd5f7bd917a1129.webp",
+         "aciklama": "Sweet Bonanza'da geçerli 250 deneme freespin! Bizzat test ettim, anında ödüyor."},
         {"name": "Atlasbet", "bonus_text": "300 TL Deneme Bonusu + 40 Freespin", "promo_kod": "ATLAS300",
          "affiliate_link": "https://www.denemebonuscuyuz.com", "kategori": "vip", "sira": 2,
          "logo_url": "/static/images/atlasbet-bonus.webp",
