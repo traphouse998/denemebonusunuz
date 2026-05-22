@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Site Düzenle</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#09090b;color:#fafafa;min-height:100vh}
+.topbar{background:#111115;border-bottom:1px solid #27272a;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.topbar h1{font-size:16px;font-weight:800;color:#f97316}
+.topbar a{font-size:13px;color:#94a3b8;text-decoration:none;font-weight:600}
+.topbar a:hover{color:#f97316}
+.wrap{max-width:600px;margin:0 auto;padding:24px 20px}
+.box{background:#111115;border:1px solid #27272a;border-radius:14px;padding:24px}
+h2{font-size:16px;font-weight:800;color:#e4e4e7;margin-bottom:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:12px;color:#71717a;font-weight:600;margin-bottom:4px}
+input,select,textarea{width:100%;background:#1c1c1f;border:1px solid #27272a;border-radius:8px;padding:9px 12px;color:#fafafa;font-size:13px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#f97316}
+textarea{height:70px;resize:vertical}
+.check-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.check-row input{width:auto}
+.check-row label{margin:0;font-size:13px;color:#e4e4e7}
+.btns{display:flex;gap:10px;margin-top:20px}
+.btn{padding:11px 22px;border-radius:8px;font-weight:700;font-size:13px;border:none;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-orange{background:#f97316;color:#fff}
+.btn-gray{background:#27272a;color:#a1a1aa}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1>✏️ Site Düzenle — {{ site.name }}</h1>
+  <a href="/admin/panel">← Geri</a>
+</div>
+<div class="wrap">
+  <div class="box">
+    <form method="POST">
+      <div class="form-grid">
+        <div><label>Site Adı *</label><input name="name" value="{{ site.name }}" required></div>
+        <div><label>Bonus Metni *</label><input name="bonus_text" value="{{ site.bonus_text }}" required></div>
+        <div><label>Affiliate Link *</label><input name="affiliate_link" value="{{ site.affiliate_link }}" required></div>
+        <div><label>Promo Kodu</label><input name="promo_kod" value="{{ site.promo_kod or '' }}"></div>
+        <div><label>Logo URL</label><input name="logo_url" value="{{ site.logo_url or '' }}"></div>
+        <div>
+          <label>Kategori</label>
+          <select name="kategori">
+            <option value="vip" {{ 'selected' if site.kategori=='vip' }}>⭐ VIP</option>
+            <option value="onerilen" {{ 'selected' if site.kategori=='onerilen' }}>✓ Önerilen</option>
+            <option value="yeni" {{ 'selected' if site.kategori=='yeni' }}>🆕 Yeni</option>
+          </select>
+        </div>
+        <div><label>Sıra</label><input name="sira" type="number" value="{{ site.sira }}"></div>
+      </div>
+      <div style="margin-top:12px">
+        <label>Açıklama</label>
+        <textarea name="aciklama">{{ site.aciklama or '' }}</textarea>
+      </div>
+      <div class="check-row" style="margin-top:12px">
+        <input type="checkbox" name="aktif" id="aktif" {{ 'checked' if site.aktif }}>
+        <label for="aktif">Aktif</label>
+      </div>
+      <div class="btns">
+        <button type="submit" class="btn btn-orange">Kaydet</button>
+        <a href="/admin/panel" class="btn btn-gray">İptal</a>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

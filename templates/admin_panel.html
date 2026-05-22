@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Panel — denemebonusunuz.xyz</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#09090b;color:#fafafa;min-height:100vh}
+.topbar{background:#111115;border-bottom:1px solid #27272a;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.topbar h1{font-size:16px;font-weight:800;color:#f97316}
+.topbar-links{display:flex;gap:12px}
+.topbar-links a{font-size:13px;color:#94a3b8;text-decoration:none;font-weight:600}
+.topbar-links a:hover{color:#f97316}
+.wrap{max-width:900px;margin:0 auto;padding:24px 20px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.stat-card{background:#111115;border:1px solid #27272a;border-radius:12px;padding:16px;text-align:center}
+.stat-val{font-size:26px;font-weight:900;color:#f97316}
+.stat-lbl{font-size:12px;color:#71717a;margin-top:4px;font-weight:600}
+.flash{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#4ade80;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px}
+.section-title{font-size:15px;font-weight:800;color:#e4e4e7;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #27272a}
+.add-form{background:#111115;border:1px solid #27272a;border-radius:14px;padding:20px;margin-bottom:28px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid.full{grid-template-columns:1fr}
+label{display:block;font-size:12px;color:#71717a;font-weight:600;margin-bottom:4px}
+input,select,textarea{width:100%;background:#1c1c1f;border:1px solid #27272a;border-radius:8px;padding:9px 12px;color:#fafafa;font-size:13px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#f97316}
+textarea{height:70px;resize:vertical}
+.btn{display:inline-block;padding:10px 20px;border-radius:8px;font-weight:700;font-size:13px;border:none;cursor:pointer;text-decoration:none}
+.btn-orange{background:#f97316;color:#fff}
+.btn-orange:hover{background:#ea6800}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.btn-blue{background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.3)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:12px;color:#71717a;font-weight:600;padding:10px 12px;border-bottom:2px solid #27272a}
+td{padding:12px;border-bottom:1px solid #1c1c1f;font-size:13px}
+tr:hover td{background:#111115}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px}
+.badge-vip{background:rgba(249,115,22,.15);color:#f97316}
+.badge-onerilen{background:rgba(34,197,94,.12);color:#22c55e}
+.badge-yeni{background:rgba(99,102,241,.12);color:#818cf8}
+.aktif-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.dot-on{background:#22c55e}
+.dot-off{background:#71717a}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1>🔧 Admin Panel — denemebonusunuz.xyz</h1>
+  <div class="topbar-links">
+    <a href="/">Siteyi Gör</a>
+    <a href="/admin/seed">Örnek Veri</a>
+    <a href="/admin/logout">Çıkış</a>
+  </div>
+</div>
+<div class="wrap">
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}{% for m in messages %}<div class="flash">✓ {{ m }}</div>{% endfor %}{% endif %}
+  {% endwith %}
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-val">{{ sites|length }}</div><div class="stat-lbl">Toplam Site</div></div>
+    <div class="stat-card"><div class="stat-val">{{ total_clicks }}</div><div class="stat-lbl">Toplam Tıklanma</div></div>
+    <div class="stat-card"><div class="stat-val">{{ sites|selectattr('aktif')|list|length }}</div><div class="stat-lbl">Aktif Site</div></div>
+  </div>
+
+  <!-- YENİ SİTE EKLE -->
+  <div class="section-title">➕ Yeni Site Ekle</div>
+  <div class="add-form">
+    <form method="POST" action="/admin/site/add">
+      <div class="form-grid">
+        <div>
+          <label>Site Adı *</label>
+          <input name="name" placeholder="Betbom" required>
+        </div>
+        <div>
+          <label>Bonus Metni *</label>
+          <input name="bonus_text" placeholder="500 TL + 50 Freespin" required>
+        </div>
+        <div>
+          <label>Affiliate Link *</label>
+          <input name="affiliate_link" placeholder="https://..." required>
+        </div>
+        <div>
+          <label>Promo Kodu</label>
+          <input name="promo_kod" placeholder="BETBOM500">
+        </div>
+        <div>
+          <label>Logo URL</label>
+          <input name="logo_url" placeholder="https://...">
+        </div>
+        <div>
+          <label>Kategori</label>
+          <select name="kategori">
+            <option value="vip">⭐ VIP</option>
+            <option value="onerilen" selected>✓ Önerilen</option>
+            <option value="yeni">🆕 Yeni</option>
+          </select>
+        </div>
+        <div>
+          <label>Sıra</label>
+          <input name="sira" type="number" value="0">
+        </div>
+      </div>
+      <div class="form-grid full" style="margin-top:10px">
+        <div>
+          <label>Açıklama</label>
+          <textarea name="aciklama" placeholder="Site hakkında kısa not..."></textarea>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <button type="submit" class="btn btn-orange">Site Ekle</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- SİTE LİSTESİ -->
+  <div class="section-title">📋 Siteler</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Site</th><th>Bonus</th><th>Promo Kodu</th><th>Kategori</th><th>Tıklanma</th><th>Durum</th><th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for site in sites %}
+      <tr>
+        <td><strong>{{ site.name }}</strong></td>
+        <td>{{ site.bonus_text }}</td>
+        <td>
+          {% if site.promo_kod %}
+          <code style="background:#1c1c1f;padding:2px 8px;border-radius:5px;color:#f97316;font-size:12px">{{ site.promo_kod }}</code>
+          {% else %}<span style="color:#71717a">—</span>{% endif %}
+        </td>
+        <td>
+          <span class="badge badge-{{ site.kategori }}">{{ site.badge_label() }}</span>
+        </td>
+        <td>{{ site.toplam_tiklanma() }}</td>
+        <td><span class="aktif-dot {{ 'dot-on' if site.aktif else 'dot-off' }}"></span>{{ 'Aktif' if site.aktif else 'Pasif' }}</td>
+        <td style="display:flex;gap:6px">
+          <a href="/admin/site/edit/{{ site.id }}" class="btn btn-sm btn-blue">Düzenle</a>
+          <form method="POST" action="/admin/site/delete/{{ site.id }}" onsubmit="return confirm('Sil?')">
+            <button type="submit" class="btn btn-sm btn-red">Sil</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
