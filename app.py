@@ -39,6 +39,12 @@ class Site(db.Model):
     sira = db.Column(db.Integer, default=0)
     aciklama = db.Column(db.Text, default="")
 
+    def badge_label(self):
+        return {"vip": "⭐ VIP", "onerilen": "✓ ÖNERİLEN", "yeni": "🆕 YENİ"}.get(self.kategori, "")
+
+    def toplam_tiklanma(self):
+        return Click.query.filter_by(site_id=self.id).count()
+
 
 class Click(db.Model):
     id = db.Column(db.Integer, primary_key=True)
