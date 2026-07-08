@@ -50,10 +50,200 @@ body::before {
   position: relative;
   z-index: 1;
   min-height: 100vh;
+  padding: 12px 16px 24px;
+}
+
+/* ── 3-COLUMN LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  gap: 14px;
+  max-width: 980px;
+  margin: 0 auto;
+  align-items: start;
+}
+.machine-col { display: flex; flex-direction: column; align-items: center; }
+
+/* ── SIDE PANELS ── */
+.side-panel {
+  background: linear-gradient(180deg, #0f3010 0%, #061406 100%);
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  padding: 14px 12px;
+  position: sticky;
+  top: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5), inset 0 1px 0 rgba(245,197,24,.08);
+}
+.panel-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--gold2);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #1a3a1a;
+  margin-bottom: 10px;
+}
+
+/* ── PAY TABLE (LEFT) ── */
+.pay-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 12px 12px 24px;
+  justify-content: space-between;
+  padding: 6px 4px;
+  border-radius: 7px;
+  margin-bottom: 3px;
+  transition: background .15s;
+}
+.pay-row:hover { background: rgba(245,197,24,.07); }
+.pay-row.jackpot { background: rgba(245,197,24,.1); border: 1px solid rgba(200,160,32,.25); }
+.pay-syms { font-size: 16px; letter-spacing: -2px; line-height: 1; }
+.pay-sym-text {
+  font-size: 11px;
+  font-weight: 900;
+  font-family: Georgia, serif;
+  background: linear-gradient(180deg, #8b6914, #f5c518, #8b6914);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.pay-sym-7 {
+  font-size: 15px;
+  font-weight: 900;
+  color: #ff4444;
+  text-shadow: 0 0 6px rgba(255,50,50,.5);
+  font-family: Georgia, serif;
+}
+.pay-mult {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--gold2);
+  background: rgba(245,197,24,.1);
+  padding: 2px 8px;
+  border-radius: 6px;
+  min-width: 48px;
+  text-align: center;
+}
+.pay-row.jackpot .pay-mult { color: #ffe066; font-size: 14px; }
+.panel-note {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #1a3a1a;
+  line-height: 1.5;
+}
+
+/* ── WIN LINES INFO ── */
+.winlines-box {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #1a3a1a;
+}
+.winline-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.wl-num {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* ── RECENT WINNERS (RIGHT) ── */
+.winners-list { display: flex; flex-direction: column; gap: 5px; max-height: 340px; overflow: hidden; }
+.winner-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid #1a3a1a;
+  border-radius: 8px;
+  padding: 7px 8px;
+  animation: slideIn .4s ease;
+  transition: border-color .3s;
+}
+.winner-item.new { border-color: rgba(245,197,24,.3); background: rgba(245,197,24,.05); }
+@keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.w-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  background: #0a2a0a;
+  border: 1px solid #1a3a1a;
+  flex-shrink: 0;
+}
+.w-info { flex: 1; min-width: 0; }
+.w-name { font-size: 12px; font-weight: 700; color: var(--text); }
+.w-sym  { font-size: 10px; color: var(--muted); }
+.w-amt  { font-size: 13px; font-weight: 900; color: var(--green); white-space: nowrap; }
+
+/* ── BONUS CARD ── */
+.bonus-card {
+  margin-top: 12px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(200,160,32,.12), rgba(200,160,32,.04));
+  border: 1.5px solid var(--gold);
+  border-radius: 10px;
+  text-align: center;
+}
+.bonus-card-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--gold2);
+  margin-bottom: 5px;
+  letter-spacing: .5px;
+}
+.bonus-card-text {
+  font-size: 11px;
+  color: #a0c0a0;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.bonus-card-btn {
+  display: block;
+  padding: 9px 0;
+  background: linear-gradient(180deg, var(--gold3), var(--gold2), #b08010);
+  color: #0a1a0a;
+  font-size: 12px;
+  font-weight: 900;
+  border-radius: 8px;
+  text-decoration: none;
+  letter-spacing: .3px;
+  box-shadow: 0 3px 12px rgba(200,160,32,.3);
+  transition: transform .15s;
+}
+.bonus-card-btn:hover { transform: scale(1.02); }
+
+/* Live dot */
+.live-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  margin-right: 5px;
+  animation: blink 1.2s ease infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+/* ── HEADER CENTERED ── */
+.page-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* ── HIDE PANELS ON MOBILE ── */
+@media (max-width: 880px) {
+  .layout { grid-template-columns: 1fr; }
+  .side-panel { display: none; }
+  .machine-col { width: 100%; }
 }
 
 /* ── HEADER ── */
@@ -493,11 +683,70 @@ body::before {
 <div class="page">
 
   <!-- HEADER -->
-  <div class="header">
+  <div class="page-header">
     <div class="logo-text">DenemeBonus<span>unuz</span></div>
     <div class="tagline">🎰 DEMO SLOT • ÜCRETSİZ • BONUS KAZAN</div>
   </div>
 
+  <div class="layout">
+
+  <!-- LEFT: PAY TABLE -->
+  <div class="side-panel">
+    <div class="panel-title">📋 Ödeme Tablosu</div>
+
+    <div class="pay-row jackpot">
+      <span class="pay-syms"><span class="pay-sym-7">7</span><span class="pay-sym-7">7</span><span class="pay-sym-7">7</span><span class="pay-sym-7">7</span><span class="pay-sym-7">7</span></span>
+      <span class="pay-mult">×100</span>
+    </div>
+    <div class="pay-row">
+      <span class="pay-syms"><span class="pay-sym-text">BAR BAR BAR</span></span>
+      <span class="pay-mult">×30</span>
+    </div>
+    <div class="pay-row">
+      <span class="pay-syms">⭐⭐⭐</span>
+      <span class="pay-mult">×20</span>
+    </div>
+    <div class="pay-row">
+      <span class="pay-syms">🔔🔔🔔</span>
+      <span class="pay-mult">×15</span>
+    </div>
+    <div class="pay-row">
+      <span class="pay-syms">🍇🍇🍇</span>
+      <span class="pay-mult">×10</span>
+    </div>
+    <div class="pay-row">
+      <span class="pay-syms">🍑🍑🍑</span>
+      <span class="pay-mult">×8</span>
+    </div>
+    <div class="pay-row">
+      <span class="pay-syms">🍊🍊🍊</span>
+      <span class="pay-mult">×5</span>
+    </div>
+    <div class="pay-row">
+      <span class="pay-syms">🍋🍋🍋</span>
+      <span class="pay-mult">×3</span>
+    </div>
+    <div class="pay-row">
+      <span class="pay-syms">🍒🍒🍒</span>
+      <span class="pay-mult">×2</span>
+    </div>
+
+    <div class="panel-note">
+      * 3 eşleşme soldan başlar<br>* Orta satır aktif kazanç hattı
+    </div>
+
+    <div class="winlines-box">
+      <div class="panel-title" style="margin-bottom:8px">🎯 Kazanç Hatları</div>
+      <div class="winline-row"><span class="wl-num" style="background:#c8a020;color:#000">1</span>Orta satır (Ana hat)</div>
+      <div class="winline-row"><span class="wl-num" style="background:#3b82f6;color:#fff">2</span>Üst satır</div>
+      <div class="winline-row"><span class="wl-num" style="background:#22c55e;color:#000">3</span>Alt satır</div>
+      <div class="winline-row"><span class="wl-num" style="background:#a855f7;color:#fff">4</span>Çapraz ↘</div>
+      <div class="winline-row"><span class="wl-num" style="background:#ef4444;color:#fff">5</span>Çapraz ↗</div>
+    </div>
+  </div>
+
+  <!-- CENTER: MACHINE -->
+  <div class="machine-col">
   <!-- MACHINE -->
   <div class="machine">
 
@@ -574,14 +823,46 @@ body::before {
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <div class="footer">
+  <!-- FOOTER (inside machine-col) -->
+  <div class="footer" style="margin-top:12px">
     Ücretsiz demo slot · Gerçek para içermez<br>
     Bonus için → <a href="https://www.denemebonuscuyuz.com">denemebonuscuyuz.com</a><br>
     18+ Sorumlu oynayın · Kumar bağımlılığı: 182
   </div>
+  </div><!-- /machine-col -->
 
-</div>
+  <!-- RIGHT: RECENT WINNERS -->
+  <div class="side-panel">
+    <div class="panel-title">
+      <span class="live-dot"></span>CANLI KAZANANLAR
+    </div>
+    <div class="winners-list" id="winnersList">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="bonus-card" style="margin-top:14px">
+      <div class="bonus-card-title">🎁 GERÇEK BONUS AL</div>
+      <div class="bonus-card-text">
+        denemebonuscuyuz.com'da gerçek para bonus al. Yatırım şartsız!
+      </div>
+      <a href="/slot-git" class="bonus-card-btn">💰 GERÇEK KAZANÇLAR İÇİN TIKLA !</a>
+    </div>
+
+    <div class="bonus-card" style="margin-top:8px; border-color:#22c55e; background:rgba(34,197,94,.06)">
+      <div class="bonus-card-title" style="color:#22c55e">⚡ GÜNÜN BONUSU</div>
+      <div class="bonus-card-text">
+        <strong style="color:#f0e8d0">500 TL</strong> çevrimsiz deneme bonusu<br>
+        Yalnızca <strong style="color:#f5c518">bugün</strong> geçerli!
+      </div>
+      <a href="/slot-git" class="bonus-card-btn" style="background:linear-gradient(180deg,#4ade80,#22c55e,#15803d);color:#000">
+        ⚡ BONUSU KAPAT →
+      </a>
+    </div>
+  </div>
+
+  </div><!-- /layout -->
+
+</div><!-- /page -->
 
 <script>
 // ── SEMBOLLER ──────────────────────────────────────────────────────────────
@@ -909,6 +1190,84 @@ function launchConfetti() {
     }, i * 25);
   }
 }
+
+// ── CANLI KAZANANLAR ────────────────────────────────────────────────────────
+const FAKE_NAMES = [
+  'Mehmet A.','Selin K.','Burak T.','Ayşe Y.','Kemal D.',
+  'Zeynep Ö.','Hakan S.','Fatma B.','Emre C.','Gül N.',
+  'Serkan M.','Dilek A.','Berk Ü.','Esra T.','Okan R.',
+  'Merve K.','Tarık H.','Şule Y.','Can E.','Aslı B.',
+];
+const WIN_SYMS = [
+  { sym:'🍒', name:'Kiraz',  mult:2 },
+  { sym:'🍋', name:'Limon',  mult:3 },
+  { sym:'🍊', name:'Portakal', mult:5 },
+  { sym:'🍇', name:'Üzüm',  mult:10 },
+  { sym:'⭐', name:'Yıldız', mult:20 },
+  { sym:'🔔', name:'Çan',   mult:15 },
+  { sym:'BAR',name:'Bar',   mult:30 },
+  { sym:'7',  name:'Yedi',  mult:100 },
+];
+const BETS = [10,20,30,50,100];
+
+function addWinner() {
+  const list = document.getElementById('winnersList');
+  if (!list) return;
+  const name = FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)];
+  const ws   = WIN_SYMS[Math.floor(Math.random() * WIN_SYMS.length)];
+  const bet  = BETS[Math.floor(Math.random() * BETS.length)];
+  const amt  = bet * ws.mult;
+  const ago  = Math.floor(Math.random() * 55 + 5) + 's önce';
+
+  const el = document.createElement('div');
+  el.className = 'winner-item new';
+  el.innerHTML = `
+    <div class="w-avatar">${ws.sym === 'BAR' ? '<span style="font-size:8px;font-weight:900;color:#f5c518">BAR</span>' : ws.sym === '7' ? '<span style="font-size:14px;font-weight:900;color:#ff4444">7</span>' : ws.sym}</div>
+    <div class="w-info">
+      <div class="w-name">${name}</div>
+      <div class="w-sym">${ws.name} · ${ago}</div>
+    </div>
+    <div class="w-amt">+${amt.toLocaleString('tr-TR')} TL</div>
+  `;
+  list.insertBefore(el, list.firstChild);
+  setTimeout(() => el.classList.remove('new'), 500);
+
+  // Keep max 8
+  while (list.children.length > 8) list.removeChild(list.lastChild);
+}
+
+// Seed initial winners
+const seedData = [
+  { name:'Selin K.',  ws:WIN_SYMS[7], bet:50  },
+  { name:'Mehmet A.', ws:WIN_SYMS[5], bet:100 },
+  { name:'Burak T.',  ws:WIN_SYMS[4], bet:30  },
+  { name:'Ayşe Y.',   ws:WIN_SYMS[6], bet:50  },
+  { name:'Emre C.',   ws:WIN_SYMS[2], bet:20  },
+  { name:'Zeynep Ö.', ws:WIN_SYMS[3], bet:100 },
+];
+function seedWinners() {
+  const list = document.getElementById('winnersList');
+  if (!list) return;
+  seedData.forEach((d, i) => {
+    const amt = d.bet * d.ws.mult;
+    const ago = (i*2 + 1) + 'dk önce';
+    const el = document.createElement('div');
+    el.className = 'winner-item';
+    el.innerHTML = `
+      <div class="w-avatar">${d.ws.sym === 'BAR' ? '<span style="font-size:8px;font-weight:900;color:#f5c518">BAR</span>' : d.ws.sym === '7' ? '<span style="font-size:14px;font-weight:900;color:#ff4444">7</span>' : d.ws.sym}</div>
+      <div class="w-info">
+        <div class="w-name">${d.name}</div>
+        <div class="w-sym">${d.ws.name} · ${ago}</div>
+      </div>
+      <div class="w-amt">+${amt.toLocaleString('tr-TR')} TL</div>
+    `;
+    list.appendChild(el);
+  });
+}
+seedWinners();
+// Add new winner every 8-14 seconds
+setInterval(addWinner, Math.random() * 6000 + 8000);
+setInterval(addWinner, Math.random() * 6000 + 12000);
 
 // ── INIT ────────────────────────────────────────────────────────────────────
 buildReels();
