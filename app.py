@@ -181,6 +181,34 @@ def index():
     return render_template("index.html")
 
 
+# ─── OYUN GÖRSELI PROXY ────────────────────────────────────────────────────
+
+@app.route("/game-img/<filename>")
+def game_img_proxy(filename):
+    """Oyun görsellerini betbom195 CDN'inden proxy ile çeker."""
+    import urllib.request as _ur
+    from flask import Response
+    allowed_ext = {"webp", "gif", "svg", "jpg", "jpeg", "png"}
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    if ext not in allowed_ext:
+        return "", 404
+    cdn_url = f"https://www.betbom195.com/content/images/casino/icon3/{filename}"
+    try:
+        req = _ur.Request(cdn_url, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0",
+            "Referer": "https://www.betbom195.com/",
+            "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
+        })
+        with _ur.urlopen(req, timeout=8) as r:
+            data = r.read()
+            ct = r.headers.get("Content-Type", f"image/{ext}")
+        resp = Response(data, content_type=ct)
+        resp.headers["Cache-Control"] = "public, max-age=604800"
+        return resp
+    except Exception:
+        return "", 404
+
+
 # ─── SLOT MAKİNESİ YÖNLENDİRME ───────────────────────────────────────────
 
 @app.route("/slot-git")

@@ -6,686 +6,467 @@
 <title>Deneme Bonusunuz — Slot Oyunu</title>
 <meta name="description" content="Ücretsiz slot oyununu oyna, üç eşleştir ve özel deneme bonusunu kap!">
 <link rel="canonical" href="https://denemebonusunuz.xyz/">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-:root {
-  --bg: #071507;
-  --machine-bg: #0b2a0b;
-  --machine-dark: #061406;
-  --gold: #c8a020;
-  --gold2: #f5c518;
-  --gold3: #ffe066;
-  --reel-bg: #030e03;
-  --reel-sep: #1a3a1a;
-  --text: #f0e8d0;
-  --muted: #7a9a7a;
-  --red: #ef4444;
-  --green: #22c55e;
-  --blue: #3b82f6;
-  --purple: #a855f7;
+:root{
+  --bg:#06030f;
+  --machine-bg:#100728;
+  --gold:#d4af37;
+  --gold2:#ffd700;
+  --gold3:#fff8b0;
+  --gold-dim:#8b6914;
+  --reel-bg:#050112;
+  --reel-sep:#1e0a38;
+  --text:#f5e8c0;
+  --muted:#7a6a9a;
+  --red:#ef4444;
+  --green:#22c55e;
+  --blue:#3b82f6;
+  --purple:#a855f7;
 }
 
-html, body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
+html,body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
 }
 
-/* ── BG FELT ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(ellipse 80% 80% at 50% 50%, #0d2a0d 0%, #050e05 100%);
-  z-index: 0;
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 20%,rgba(80,0,180,.18) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 80%,rgba(150,30,0,.12) 0%,transparent 60%),
+    radial-gradient(ellipse 80% 80% at 50% 50%,#0f0520 0%,#06030f 100%);
+  z-index:0;
+  animation:bgBreath 10s ease infinite alternate;
 }
+@keyframes bgBreath{from{filter:brightness(1)}to{filter:brightness(1.08)}}
 
-.page {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-  padding: 12px 16px 24px;
-}
+#sparkleCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
 
-/* ── 3-COLUMN LAYOUT ── */
-.layout {
-  display: grid;
-  grid-template-columns: 220px 1fr 220px;
-  gap: 14px;
-  max-width: 980px;
-  margin: 0 auto;
-  align-items: start;
+.page{position:relative;z-index:1;min-height:100vh;padding:10px 14px 20px}
+
+/* ── LAYOUT ── */
+.layout{
+  display:grid;
+  grid-template-columns:210px 1fr 210px;
+  gap:12px;
+  max-width:1000px;
+  margin:0 auto;
+  align-items:start;
 }
-.machine-col { display: flex; flex-direction: column; align-items: center; }
+.machine-col{display:flex;flex-direction:column;align-items:center}
 
 /* ── SIDE PANELS ── */
-.side-panel {
-  background: linear-gradient(180deg, #0f3010 0%, #061406 100%);
-  border: 2px solid var(--gold);
-  border-radius: 14px;
-  padding: 14px 12px;
-  position: sticky;
-  top: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,.5), inset 0 1px 0 rgba(245,197,24,.08);
+.side-panel{
+  background:linear-gradient(180deg,rgba(22,10,48,.97) 0%,rgba(10,5,25,.97) 100%);
+  border:1.5px solid rgba(212,175,55,.45);
+  border-radius:14px;
+  padding:13px 11px;
+  position:sticky;
+  top:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,.6),inset 0 1px 0 rgba(212,175,55,.12);
 }
-.panel-title {
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--gold2);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  text-align: center;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #1a3a1a;
-  margin-bottom: 10px;
-}
-
-/* ── PAY TABLE (LEFT) ── */
-.pay-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 4px;
-  border-radius: 7px;
-  margin-bottom: 3px;
-  transition: background .15s;
-}
-.pay-row:hover { background: rgba(245,197,24,.07); }
-.pay-row.jackpot { background: rgba(245,197,24,.1); border: 1px solid rgba(200,160,32,.25); }
-.pay-syms { font-size: 16px; letter-spacing: -2px; line-height: 1; }
-.pay-sym-text {
-  font-size: 11px;
-  font-weight: 900;
-  font-family: Georgia, serif;
-  background: linear-gradient(180deg, #8b6914, #f5c518, #8b6914);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.pay-sym-7 {
-  font-size: 15px;
-  font-weight: 900;
-  color: #ff4444;
-  text-shadow: 0 0 6px rgba(255,50,50,.5);
-  font-family: Georgia, serif;
-}
-.pay-mult {
-  font-size: 13px;
-  font-weight: 900;
-  color: var(--gold2);
-  background: rgba(245,197,24,.1);
-  padding: 2px 8px;
-  border-radius: 6px;
-  min-width: 48px;
-  text-align: center;
-}
-.pay-row.jackpot .pay-mult { color: #ffe066; font-size: 14px; }
-.panel-note {
-  font-size: 10px;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid #1a3a1a;
-  line-height: 1.5;
+.panel-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:13px;
+  letter-spacing:3px;
+  color:var(--gold2);
+  text-align:center;
+  padding-bottom:9px;
+  border-bottom:1px solid rgba(212,175,55,.18);
+  margin-bottom:9px;
 }
 
-/* ── WIN LINES INFO ── */
-.winlines-box {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #1a3a1a;
+/* ── PAY TABLE ── */
+.pay-row{display:flex;align-items:center;justify-content:space-between;padding:5px 4px;border-radius:7px;margin-bottom:2px}
+.pay-row:hover{background:rgba(212,175,55,.06)}
+.pay-row.jackpot{background:rgba(212,175,55,.09);border:1px solid rgba(212,175,55,.2)}
+.pay-syms{font-size:14px;letter-spacing:-2px;line-height:1}
+.pay-sym-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:12px;letter-spacing:2px;
+  background:linear-gradient(180deg,#fff4a0,#ffd700,#8b6914);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.winline-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 0;
-  font-size: 11px;
-  color: var(--muted);
+.pay-sym-7{font-family:'Bebas Neue',sans-serif;font-size:16px;color:#ff3300;text-shadow:0 0 8px rgba(255,50,0,.6)}
+.pay-mult{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:13px;letter-spacing:1px;
+  color:var(--gold2);
+  background:rgba(212,175,55,.1);
+  padding:2px 7px;border-radius:5px;
+  min-width:44px;text-align:center;
 }
-.wl-num {
-  width: 18px; height: 18px;
-  border-radius: 4px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 800;
-  flex-shrink: 0;
-}
+.panel-note{font-size:9.5px;color:var(--muted);text-align:center;margin-top:9px;padding-top:7px;border-top:1px solid rgba(212,175,55,.15);line-height:1.5}
+.winlines-box{margin-top:10px;padding-top:10px;border-top:1px solid rgba(212,175,55,.15)}
+.winline-row{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:10.5px;color:var(--muted)}
+.wl-num{width:17px;height:17px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0}
 
-/* ── RECENT WINNERS (RIGHT) ── */
-.winners-list { display: flex; flex-direction: column; gap: 5px; max-height: 340px; overflow: hidden; }
-.winner-item {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: rgba(255,255,255,.03);
-  border: 1px solid #1a3a1a;
-  border-radius: 8px;
-  padding: 7px 8px;
-  animation: slideIn .4s ease;
-  transition: border-color .3s;
+/* ── WINNERS ── */
+.winners-list{display:flex;flex-direction:column;gap:4px;max-height:315px;overflow:hidden}
+.winner-item{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.02);
+  border:1px solid rgba(212,175,55,.08);
+  border-radius:8px;padding:6px 7px;
+  animation:slideIn .4s ease;
 }
-.winner-item.new { border-color: rgba(245,197,24,.3); background: rgba(245,197,24,.05); }
-@keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-.w-avatar {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px;
-  background: #0a2a0a;
-  border: 1px solid #1a3a1a;
-  flex-shrink: 0;
-}
-.w-info { flex: 1; min-width: 0; }
-.w-name { font-size: 12px; font-weight: 700; color: var(--text); }
-.w-sym  { font-size: 10px; color: var(--muted); }
-.w-amt  { font-size: 13px; font-weight: 900; color: var(--green); white-space: nowrap; }
+.winner-item.new{border-color:rgba(212,175,55,.28);background:rgba(212,175,55,.05)}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.w-avatar{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;background:#0d0823;border:1px solid rgba(212,175,55,.2);flex-shrink:0}
+.w-info{flex:1;min-width:0}
+.w-name{font-size:11px;font-weight:700;color:var(--text)}
+.w-sym{font-size:9.5px;color:var(--muted)}
+.w-amt{font-size:12px;font-weight:900;color:var(--green);white-space:nowrap}
 
-/* ── BONUS CARD ── */
-.bonus-card {
-  margin-top: 12px;
-  padding: 12px;
-  background: linear-gradient(135deg, rgba(200,160,32,.12), rgba(200,160,32,.04));
-  border: 1.5px solid var(--gold);
-  border-radius: 10px;
-  text-align: center;
-}
-.bonus-card-title {
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--gold2);
-  margin-bottom: 5px;
-  letter-spacing: .5px;
-}
-.bonus-card-text {
-  font-size: 11px;
-  color: #a0c0a0;
-  line-height: 1.5;
-  margin-bottom: 10px;
-}
-.bonus-card-btn {
-  display: block;
-  padding: 9px 0;
-  background: linear-gradient(180deg, var(--gold3), var(--gold2), #b08010);
-  color: #0a1a0a;
-  font-size: 12px;
-  font-weight: 900;
-  border-radius: 8px;
-  text-decoration: none;
-  letter-spacing: .3px;
-  box-shadow: 0 3px 12px rgba(200,160,32,.3);
-  transition: transform .15s;
-}
-.bonus-card-btn:hover { transform: scale(1.02); }
+/* ── BONUS CARDS ── */
+.bonus-card{margin-top:11px;padding:10px;background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(212,175,55,.03));border:1.5px solid rgba(212,175,55,.45);border-radius:10px;text-align:center}
+.bonus-card-title{font-size:11px;font-weight:800;color:var(--gold2);margin-bottom:4px;letter-spacing:.5px}
+.bonus-card-text{font-size:10.5px;color:#9090c0;line-height:1.45;margin-bottom:9px}
+.bonus-card-btn{display:block;padding:8px 0;background:linear-gradient(180deg,var(--gold3),var(--gold2),#b08010);color:#0a0818;font-size:11px;font-weight:900;border-radius:8px;text-decoration:none;box-shadow:0 3px 12px rgba(212,175,55,.3);transition:transform .15s}
+.bonus-card-btn:hover{transform:scale(1.02)}
 
-/* Live dot */
-.live-dot {
-  display: inline-block;
-  width: 7px; height: 7px;
-  background: var(--green);
-  border-radius: 50%;
-  margin-right: 5px;
-  animation: blink 1.2s ease infinite;
-}
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-
-/* ── HEADER CENTERED ── */
-.page-header {
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-/* ── HIDE PANELS ON MOBILE ── */
-@media (max-width: 880px) {
-  .layout { grid-template-columns: 1fr; }
-  .side-panel { display: none; }
-  .machine-col { width: 100%; }
-}
+.live-dot{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:5px;animation:blink 1.2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
 /* ── HEADER ── */
-.header {
-  text-align: center;
-  margin-bottom: 10px;
+.page-header{text-align:center;margin-bottom:8px}
+.logo-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:30px;letter-spacing:5px;
+  background:linear-gradient(180deg,var(--gold3) 0%,var(--gold2) 50%,var(--gold-dim) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 14px rgba(212,175,55,.4));
 }
-.logo-text {
-  font-size: 20px;
-  font-weight: 900;
-  color: var(--gold2);
-  text-shadow: 0 0 20px rgba(245,197,24,.4);
-  letter-spacing: -.3px;
-}
-.logo-text span { color: #e0e0c0; }
-.tagline { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: .5px; margin-top: 2px; }
+.tagline{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-top:1px}
 
-/* ── MACHINE ── */
-.machine {
-  width: 100%;
-  max-width: 480px;
-  background: linear-gradient(180deg, #0f3010 0%, var(--machine-dark) 100%);
-  border: 3px solid var(--gold);
-  border-radius: 18px;
-  padding: 12px;
+/* ── MACHINE CABINET ── */
+.machine{
+  width:100%;max-width:500px;
+  background:linear-gradient(165deg,#18083e 0%,#0d0528 50%,#08021a 100%);
+  border:3px solid var(--gold);
+  border-radius:20px;
+  padding:14px;
+  position:relative;
   box-shadow:
-    0 0 0 1px rgba(200,160,32,.15),
-    0 20px 60px rgba(0,0,0,.8),
-    inset 0 1px 0 rgba(245,197,24,.1);
-  position: relative;
+    0 0 0 1px #0c0520,
+    0 0 0 5px var(--gold-dim),
+    0 0 0 6px #0c0520,
+    0 30px 80px rgba(0,0,0,.85),
+    0 0 60px rgba(50,0,100,.2),
+    inset 0 0 40px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(212,175,55,.18);
+}
+.machine::before{
+  content:'';
+  position:absolute;
+  top:-1px;left:20%;right:20%;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold3),var(--gold2),var(--gold3),transparent);
+  border-radius:0 0 2px 2px;
 }
 
-/* Gold top bar */
-.machine::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 10%; right: 10%;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--gold3), var(--gold2), var(--gold3), transparent);
-  border-radius: 0 0 3px 3px;
+/* ── CROWN ── */
+.machine-crown{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:10px;padding-bottom:10px;
+  border-bottom:1px solid rgba(212,175,55,.2);
+}
+.crown-gem{font-size:11px;opacity:.55;color:var(--gold)}
+.crown-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:19px;letter-spacing:6px;
+  background:linear-gradient(180deg,var(--gold3),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 6px rgba(212,175,55,.4));
 }
 
 /* ── JACKPOT BAR ── */
-.jackpot-bar {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-  margin-bottom: 10px;
-}
-.jp-card {
-  border-radius: 7px;
-  padding: 5px 4px;
-  text-align: center;
-  border: 1px solid rgba(0,0,0,.3);
-}
-.jp-grand  { background: #1a0000; border-color: #8b0000; }
-.jp-major  { background: #001a00; border-color: #005500; }
-.jp-minor  { background: #00001a; border-color: #000088; }
-.jp-mini   { background: #110011; border-color: #550055; }
-.jp-label  { display: block; font-size: 9px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; }
-.jp-grand  .jp-label  { color: #ff6060; }
-.jp-major  .jp-label  { color: #60ff60; }
-.jp-minor  .jp-label  { color: #6080ff; }
-.jp-mini   .jp-label  { color: #cc88ff; }
-.jp-amount { display: block; font-size: 12px; font-weight: 900; color: #fff; margin-top: 1px; line-height: 1.2; }
+.jackpot-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:12px}
+.jp-card{border-radius:8px;padding:7px 3px;text-align:center}
+.jp-grand{background:linear-gradient(180deg,#2a0000,#150000);border:1px solid #cc2200;box-shadow:0 0 10px rgba(200,0,0,.2),inset 0 1px 0 rgba(255,100,100,.1)}
+.jp-major{background:linear-gradient(180deg,#002200,#001100);border:1px solid #00aa44;box-shadow:0 0 10px rgba(0,170,68,.2),inset 0 1px 0 rgba(100,255,150,.1)}
+.jp-minor{background:linear-gradient(180deg,#001030,#000818);border:1px solid #3366ff;box-shadow:0 0 10px rgba(50,100,255,.2),inset 0 1px 0 rgba(100,150,255,.1)}
+.jp-mini{background:linear-gradient(180deg,#1a0030,#0d0018);border:1px solid #8833cc;box-shadow:0 0 10px rgba(130,50,200,.2),inset 0 1px 0 rgba(180,100,255,.1)}
+.jp-label{display:block;font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px}
+.jp-grand .jp-label{color:#ff6644}
+.jp-major .jp-label{color:#44ee88}
+.jp-minor .jp-label{color:#6699ff}
+.jp-mini  .jp-label{color:#cc88ff}
+.jp-amount{display:block;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#fff;margin-top:2px}
 
 /* ── REELS FRAME ── */
-.reels-outer {
-  background: var(--machine-dark);
-  border: 3px solid var(--gold);
-  border-radius: 10px;
-  padding: 8px 6px;
-  position: relative;
-  box-shadow: inset 0 0 20px rgba(0,0,0,.6);
+.reels-outer{
+  background:#030110;
+  border:3px solid var(--gold);
+  border-radius:12px;
+  padding:8px 7px;
+  position:relative;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.8),inset 0 0 0 1px rgba(212,175,55,.08);
 }
-
-/* Win line glow on frame */
-.reels-outer.win-glow {
-  border-color: var(--gold2);
-  box-shadow: 0 0 24px rgba(245,197,24,.5), inset 0 0 20px rgba(0,0,0,.6);
+.reels-outer.win-glow{
+  border-color:var(--gold2);
+  box-shadow:0 0 30px rgba(255,215,0,.55),0 0 60px rgba(255,215,0,.2),inset 0 0 30px rgba(0,0,0,.8);
 }
-
-/* Middle row highlight bar */
-.reels-outer::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 4px; right: 4px;
-  height: calc(100% / 3 + 4px);
-  transform: translateY(-50%);
-  border: 1.5px solid rgba(245,197,24,.25);
-  border-radius: 6px;
-  pointer-events: none;
-  z-index: 5;
+.reels-outer::before{
+  content:'';
+  position:absolute;top:50%;left:5px;right:5px;
+  height:calc(100% / 3 - 2px);
+  transform:translateY(-50%);
+  border:1.5px solid rgba(255,215,0,.2);
+  border-radius:5px;
+  pointer-events:none;z-index:5;
 }
-
-.reels {
-  display: flex;
-  gap: 5px;
-}
+.reels{display:flex;gap:5px}
 
 /* ── SINGLE REEL ── */
-.reel {
-  flex: 1;
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--reel-bg);
-  border: 1px solid #1a3a1a;
-  position: relative;
-}
+.reel{flex:1;border-radius:7px;overflow:hidden;background:#050115;border:1px solid rgba(212,175,55,.14);position:relative}
+.reel.spinning .sym-cell{filter:blur(2px)}
+.reel.stopping{animation:reelBounce .22s ease}
+@keyframes reelBounce{0%{transform:scaleY(1)}30%{transform:scaleY(1.05)}60%{transform:scaleY(.97)}100%{transform:scaleY(1)}}
 
-.reel.spinning .sym-cell {
-  filter: blur(1.5px);
+.sym-cell{
+  height:80px;
+  display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid #1a0830;
+  position:relative;
 }
-.reel.stopping {
-  animation: reelBounce .25s ease;
+.sym-cell:last-child{border-bottom:none}
+.sym-cell.mid{background:linear-gradient(180deg,#0e0532,#080220)}
+.sym-cell.top,.sym-cell.bot{background:#050115;opacity:.78}
+.sym-cell.win-cell{
+  background:rgba(255,215,0,.13)!important;
+  opacity:1!important;
+  animation:cellPulse .45s ease infinite alternate;
 }
-@keyframes reelBounce {
-  0%   { transform: scaleY(1); }
-  30%  { transform: scaleY(1.04); }
-  60%  { transform: scaleY(.97); }
-  100% { transform: scaleY(1); }
-}
-
-.sym-cell {
-  height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36px;
-  border-bottom: 1px solid var(--reel-sep);
-  transition: background .15s;
-  position: relative;
-}
-.sym-cell:last-child { border-bottom: none; }
-
-/* Middle row highlight */
-.sym-cell.mid {
-  background: linear-gradient(180deg, #0a1a0a, #050f05);
-}
-.sym-cell.top, .sym-cell.bot {
-  background: linear-gradient(180deg, #030803, #030c03);
-  opacity: .85;
-}
-
-/* Win highlight */
-.sym-cell.win-cell {
-  background: rgba(245,197,24,.15) !important;
-  opacity: 1 !important;
-  animation: cellPulse .5s ease infinite alternate;
-}
-@keyframes cellPulse {
-  from { background: rgba(245,197,24,.1); }
-  to   { background: rgba(245,197,24,.25); }
+@keyframes cellPulse{
+  from{background:rgba(255,215,0,.08)}
+  to{background:rgba(255,215,0,.22);box-shadow:inset 0 0 15px rgba(255,215,0,.15)}
 }
 
 /* ── SYMBOLS ── */
-.bar-label {
-  font-size: 15px;
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  background: linear-gradient(180deg, #8b6914 0%, #f5c518 40%, #ffe066 60%, #8b6914 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-family: Georgia, serif;
-  line-height: 1;
-  padding: 0 2px;
+.sym-emoji{font-size:46px;line-height:1;display:block}
+.seven-label{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:56px;font-weight:400;
+  color:#ff2200;
+  text-shadow:0 0 10px #ff0000,0 0 25px rgba(255,50,0,.6),0 0 50px rgba(255,0,0,.3);
+  line-height:1;display:block;
 }
-.three-bar { font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 1px; }
-.three-bar span {
-  display: block; font-size: 10px; font-weight: 900; font-family: Georgia, serif;
-  background: linear-gradient(180deg, #8b6914, #f5c518, #8b6914);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  line-height: 1; letter-spacing: -.3px;
-}
-.seven-label {
-  font-size: 38px;
-  font-weight: 900;
-  color: #ff3333;
-  text-shadow: 0 0 12px rgba(255,50,50,.6), 0 0 2px #ff0000;
-  font-family: Georgia, serif;
-  line-height: 1;
+.bar-label{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;font-weight:400;letter-spacing:3px;
+  background:linear-gradient(180deg,#fff8c0 0%,#ffd700 35%,#c8960c 65%,#ffd700 85%,#fff8c0 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 2px 6px rgba(200,150,12,.5));
+  display:block;line-height:1;
 }
 
 /* ── WIN MESSAGE ── */
-.win-msg {
-  text-align: center;
-  padding: 8px 4px;
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 700;
+.win-msg{
+  text-align:center;padding:7px 4px;min-height:34px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:13px;font-weight:700;
 }
-.win-msg.big   { color: var(--gold2); font-size: 18px; animation: flash .4s ease infinite alternate; }
-.win-msg.small { color: var(--green); }
-.win-msg.miss  { color: var(--muted); font-size: 12px; }
-.win-msg.hint  { color: var(--muted); font-size: 12px; }
-@keyframes flash { from { opacity: 1; } to { opacity: .4; } }
+.win-msg.big{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:20px;letter-spacing:3px;
+  color:var(--gold2);
+  animation:flash .4s ease infinite alternate;
+}
+.win-msg.small{color:var(--green)}
+.win-msg.miss{color:var(--muted);font-size:11.5px}
+.win-msg.hint{color:var(--muted);font-size:11.5px}
+@keyframes flash{from{opacity:1}to{opacity:.4}}
 
 /* ── CONTROLS ── */
-.controls {
-  border-top: 1px solid #1a3a1a;
-  padding-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.controls{border-top:1px solid rgba(212,175,55,.18);padding-top:10px;display:flex;flex-direction:column;gap:9px}
 
-.stats-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 6px;
+.stats-row{
+  display:flex;justify-content:space-between;align-items:center;gap:6px;
+  background:rgba(0,0,0,.3);
+  border:1px solid rgba(212,175,55,.12);
+  border-radius:10px;padding:8px 10px;
 }
-.stat-block { text-align: center; flex: 1; }
-.stat-lbl { font-size: 9px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-.stat-val { font-size: 17px; font-weight: 900; color: var(--gold2); display: block; margin-top: 1px; }
-.stat-val.win-val { color: var(--green); }
-.stat-sep { width: 1px; height: 32px; background: #1a3a1a; flex-shrink: 0; }
+.stat-block{text-align:center;flex:1}
+.stat-lbl{font-family:'Bebas Neue',sans-serif;font-size:11px;color:var(--muted);letter-spacing:1.5px}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:1px;color:var(--gold2);display:block;margin-top:0}
+.stat-val.win-val{color:var(--green)}
+.stat-sep{width:1px;height:36px;background:rgba(212,175,55,.15);flex-shrink:0}
 
-/* Bet buttons */
-.bet-row {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.bet-row{display:flex;align-items:center;gap:5px}
+.bet-label{font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--muted);letter-spacing:1px;flex-shrink:0}
+.bet-buttons{display:flex;gap:4px;flex:1}
+.bet-btn{
+  flex:1;padding:7px 0;
+  background:rgba(0,0,0,.4);
+  border:1px solid rgba(212,175,55,.15);
+  border-radius:7px;
+  color:var(--muted);
+  font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;
+  cursor:pointer;transition:all .15s;
 }
-.bet-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; flex-shrink: 0; }
-.bet-buttons { display: flex; gap: 4px; flex: 1; }
-.bet-btn {
-  flex: 1;
-  padding: 7px 0;
-  background: #0a1a0a;
-  border: 1px solid #1a3a1a;
-  border-radius: 7px;
-  color: #7a9a7a;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all .15s;
-  font-family: inherit;
-}
-.bet-btn:hover { border-color: var(--gold); color: var(--gold2); }
-.bet-btn.active { background: rgba(200,160,32,.15); border-color: var(--gold); color: var(--gold2); }
-.bet-btn:disabled { opacity: .4; cursor: not-allowed; }
+.bet-btn:hover{border-color:var(--gold);color:var(--gold2)}
+.bet-btn.active{background:rgba(212,175,55,.12);border-color:var(--gold);color:var(--gold2);box-shadow:0 0 8px rgba(212,175,55,.2)}
+.bet-btn:disabled{opacity:.4;cursor:not-allowed}
 
-/* Spin button */
-.spin-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+.spin-row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.auto-btn{
+  flex:1;height:60px;
+  background:rgba(0,0,0,.4);
+  border:1px solid rgba(212,175,55,.18);
+  border-radius:12px;
+  color:var(--muted);
+  font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;
+  cursor:pointer;transition:all .15s;line-height:1.4;
 }
-.auto-btn {
-  width: 52px;
-  padding: 0 6px;
-  height: 54px;
-  background: #0a1a0a;
-  border: 1px solid #1a3a1a;
-  border-radius: 10px;
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  text-align: center;
-  line-height: 1.3;
-  font-family: inherit;
-  transition: all .15s;
-  flex-shrink: 0;
-}
-.auto-btn:hover { border-color: var(--gold); color: var(--gold2); }
+.auto-btn:hover{border-color:var(--gold);color:var(--gold2)}
 
-.spin-btn {
-  flex: 1;
-  height: 54px;
-  background: linear-gradient(180deg, var(--gold3) 0%, var(--gold2) 40%, #b08010 100%);
-  border: none;
-  border-radius: 12px;
-  color: #0a1a0a;
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 16px rgba(200,160,32,.4), inset 0 1px 0 rgba(255,255,255,.3);
-  transition: transform .1s, box-shadow .1s;
-  font-family: inherit;
+/* ROUND SPIN BUTTON */
+.spin-btn{
+  width:88px;height:88px;border-radius:50%;
+  font-size:42px;
+  background:radial-gradient(circle at 35% 30%,#fff8b0 0%,#ffd700 42%,#b08010 100%);
+  border:4px solid #ffe866;
+  color:#0a0818;cursor:pointer;
+  position:relative;overflow:hidden;flex-shrink:0;
+  box-shadow:
+    0 0 0 3px rgba(212,175,55,.3),
+    0 6px 25px rgba(212,175,55,.5),
+    0 2px 6px rgba(0,0,0,.5),
+    inset 0 3px 0 rgba(255,255,255,.4);
+  transition:transform .1s,box-shadow .1s;
+  animation:spinPulse 2.5s ease infinite;
 }
-.spin-btn::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
-  transform: skewX(-15deg);
-  transition: left .5s;
+@keyframes spinPulse{
+  0%,100%{box-shadow:0 0 0 3px rgba(212,175,55,.3),0 6px 25px rgba(212,175,55,.5),0 2px 6px rgba(0,0,0,.5),inset 0 3px 0 rgba(255,255,255,.4)}
+  50%{box-shadow:0 0 0 6px rgba(212,175,55,.4),0 8px 35px rgba(212,175,55,.75),0 2px 6px rgba(0,0,0,.5),inset 0 3px 0 rgba(255,255,255,.4)}
 }
-.spin-btn:hover::before { left: 150%; }
-.spin-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,160,32,.5); }
-.spin-btn:active { transform: translateY(0); }
-.spin-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; filter: grayscale(.5); }
-.spin-btn.spinning-state { background: #333; color: #888; box-shadow: none; }
+.spin-btn::before{
+  content:'';position:absolute;
+  top:10%;left:10%;width:80%;height:45%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.35) 0%,transparent 80%);
+  border-radius:50%;pointer-events:none;
+}
+.spin-btn:hover{transform:scale(1.05)}
+.spin-btn:active{transform:scale(.97)}
+.spin-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;animation:none;filter:grayscale(.7)}
+.spin-btn.spinning-state{background:#2a2a2a;color:#666;box-shadow:none;animation:none;border-color:#444}
 
 /* ── BIG WIN OVERLAY ── */
-.bigwin-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  background: rgba(0,0,0,.9);
-  backdrop-filter: blur(8px);
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+.bigwin-overlay{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,10,.93);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;padding:20px;
 }
-.bigwin-overlay.show { display: flex; animation: fadeIn .4s ease; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.bigwin-overlay.show{display:flex;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-.bigwin-box {
-  background: linear-gradient(180deg, #1a3a00 0%, #0a1a00 100%);
-  border: 3px solid var(--gold);
-  border-radius: 24px;
-  padding: 32px 24px 28px;
-  text-align: center;
-  max-width: 360px;
-  width: 100%;
-  box-shadow: 0 0 80px rgba(245,197,24,.4);
-  animation: popIn .5s cubic-bezier(.34,1.56,.64,1);
+.bigwin-box{
+  background:linear-gradient(160deg,#1a0838 0%,#0d0524 100%);
+  border:3px solid var(--gold);border-radius:24px;
+  padding:32px 24px 28px;text-align:center;
+  max-width:380px;width:100%;
+  box-shadow:
+    0 0 0 1px #080510,
+    0 0 0 4px var(--gold-dim),
+    0 0 80px rgba(212,175,55,.45),
+    0 0 150px rgba(100,0,200,.2);
+  animation:popIn .5s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes popIn { from { transform: scale(.6) rotate(-3deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+@keyframes popIn{from{transform:scale(.6) rotate(-3deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
 
-.bigwin-coins { font-size: 56px; margin-bottom: 8px; animation: coinSpin 1.5s linear infinite; display: inline-block; }
-@keyframes coinSpin { to { transform: rotateY(360deg); } }
+.bigwin-icon{font-size:68px;margin-bottom:10px;display:inline-block;animation:iconBounce 1s ease infinite}
+@keyframes iconBounce{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.15) rotate(5deg)}}
 
-.bigwin-title {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--gold);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  text-shadow: 0 0 20px rgba(245,197,24,.5);
-  margin-bottom: 6px;
+.bigwin-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;letter-spacing:7px;
+  color:var(--gold);
+  text-shadow:0 0 20px rgba(212,175,55,.5);
+  margin-bottom:8px;
 }
-.bigwin-amount {
-  font-size: 42px;
-  font-weight: 900;
-  color: var(--gold2);
-  text-shadow: 0 0 30px rgba(245,197,24,.6);
-  margin-bottom: 6px;
-  line-height: 1;
+.bigwin-amount{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:54px;letter-spacing:2px;
+  color:var(--gold2);
+  text-shadow:0 0 30px rgba(255,215,0,.7);
+  margin-bottom:8px;line-height:1;
 }
-.bigwin-amount small { font-size: 18px; }
-.bigwin-sub {
-  font-size: 13px;
-  color: #a0c0a0;
-  line-height: 1.5;
-  margin-bottom: 20px;
+.bigwin-sub{font-size:12.5px;color:#9090c0;line-height:1.55;margin-bottom:20px}
+.bigwin-btn{
+  display:block;width:100%;padding:16px;
+  background:linear-gradient(180deg,var(--gold3),var(--gold2),#b08010);
+  border:none;border-radius:12px;
+  color:#0a0818;
+  font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(212,175,55,.45);
+  margin-bottom:12px;text-decoration:none;
+  transition:transform .15s;
 }
-.bigwin-btn {
-  display: block;
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(180deg, var(--gold3), var(--gold2), #b08010);
-  border: none;
-  border-radius: 12px;
-  color: #0a1a0a;
-  font-size: 16px;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(200,160,32,.4);
-  margin-bottom: 12px;
-  text-decoration: none;
-  font-family: inherit;
-  transition: transform .15s;
-}
-.bigwin-btn:hover { transform: scale(1.02); }
-.bigwin-timer { font-size: 12px; color: var(--muted); }
-.bigwin-timer span { color: var(--gold2); font-weight: 700; }
+.bigwin-btn:hover{transform:scale(1.02)}
+.bigwin-timer{font-size:11.5px;color:var(--muted)}
+.bigwin-timer span{color:var(--gold2);font-weight:700}
 
 /* ── CONFETTI ── */
-.conf {
-  position: fixed;
-  width: 8px; height: 8px;
-  top: -10px;
-  border-radius: 2px;
-  animation: confFall linear forwards;
-  pointer-events: none;
-  z-index: 300;
-}
-@keyframes confFall {
-  to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-}
+.conf{position:fixed;width:8px;height:8px;top:-10px;border-radius:2px;animation:confFall linear forwards;pointer-events:none;z-index:300}
+@keyframes confFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
 
 /* ── FOOTER ── */
-.footer {
-  margin-top: 14px;
-  text-align: center;
-  font-size: 11px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-.footer a { color: var(--gold); font-weight: 700; text-decoration: none; }
+.footer{margin-top:10px;text-align:center;font-size:10.5px;color:var(--muted);line-height:1.6}
+.footer a{color:var(--gold);font-weight:700;text-decoration:none}
 
 /* ── RESPONSIVE ── */
-@media (max-width: 380px) {
-  .sym-cell { height: 58px; font-size: 28px; }
-  .seven-label { font-size: 30px; }
-  .jp-amount { font-size: 10px; }
-  .jp-label { font-size: 8px; }
-  .spin-btn { font-size: 17px; height: 48px; }
+@media(max-width:880px){
+  .layout{grid-template-columns:1fr}
+  .side-panel{display:none}
+  .machine-col{width:100%}
+}
+@media(max-width:420px){
+  .sym-cell{height:68px}
+  .sym-emoji{font-size:36px}
+  .seven-label{font-size:46px}
+  .bar-label{font-size:18px}
+  .spin-btn{width:76px;height:76px;font-size:36px}
+  .jp-amount{font-size:12px}
+  .jp-label{font-size:10px}
 }
 </style>
 </head>
 <body>
 
+<canvas id="sparkleCanvas"></canvas>
+
 <!-- BIG WIN OVERLAY -->
 <div class="bigwin-overlay" id="bigWinOverlay">
   <div class="bigwin-box">
-    <div class="bigwin-coins">🏆</div>
+    <div class="bigwin-icon">🏆</div>
     <div class="bigwin-title">BÜYÜK KAZANÇ!</div>
-    <div class="bigwin-amount" id="bigWinAmount"><small>+</small>5000 <small>TL</small></div>
+    <div class="bigwin-amount" id="bigWinAmount">5.000 TL</div>
     <div class="bigwin-sub">
       Tebrikler! Seni özel deneme bonusuna yönlendiriyoruz.<br>
-      <strong>denemebonuscuyuz.com</strong>'da gerçek para kazan!
+      <strong style="color:#f5e8c0">denemebonuscuyuz.com</strong>'da gerçek para kazan!
     </div>
-    <a href="/slot-git" class="bigwin-btn" id="bigWinBtn">
-      💰 GERÇEK KAZANÇLAR İÇİN TIKLA !
-    </a>
+    <a href="/slot-git" class="bigwin-btn" id="bigWinBtn">💰 GERÇEK KAZANÇLAR İÇİN TIKLA !</a>
     <div class="bigwin-timer">Otomatik yönlendirme: <span id="countdown">5</span>s</div>
   </div>
 </div>
 
 <div class="page">
 
-  <!-- HEADER -->
   <div class="page-header">
-    <div class="logo-text">DenemeBonus<span>unuz</span></div>
-    <div class="tagline">🎰 DEMO SLOT • ÜCRETSİZ • BONUS KAZAN</div>
+    <div class="logo-text">DenemeBonusunuz</div>
+    <div class="tagline">🎰 Demo Slot • Ücretsiz • Bonus Kazan</div>
   </div>
 
   <div class="layout">
@@ -693,9 +474,8 @@ body::before {
   <!-- LEFT: PAY TABLE -->
   <div class="side-panel">
     <div class="panel-title">📋 Ödeme Tablosu</div>
-
     <div class="pay-row jackpot">
-      <span class="pay-syms"><span class="pay-sym-7">7</span><span class="pay-sym-7">7</span><span class="pay-sym-7">7</span><span class="pay-sym-7">7</span><span class="pay-sym-7">7</span></span>
+      <span class="pay-syms"><span class="pay-sym-7">7 7 7 7 7</span></span>
       <span class="pay-mult">×100</span>
     </div>
     <div class="pay-row">
@@ -730,11 +510,7 @@ body::before {
       <span class="pay-syms">🍒🍒🍒</span>
       <span class="pay-mult">×2</span>
     </div>
-
-    <div class="panel-note">
-      * 3 eşleşme soldan başlar<br>* Orta satır aktif kazanç hattı
-    </div>
-
+    <div class="panel-note">* 3 eşleşme soldan başlar<br>* Orta satır aktif kazanç hattı</div>
     <div class="winlines-box">
       <div class="panel-title" style="margin-bottom:8px">🎯 Kazanç Hatları</div>
       <div class="winline-row"><span class="wl-num" style="background:#c8a020;color:#000">1</span>Orta satır (Ana hat)</div>
@@ -747,10 +523,14 @@ body::before {
 
   <!-- CENTER: MACHINE -->
   <div class="machine-col">
-  <!-- MACHINE -->
   <div class="machine">
 
-    <!-- JACKPOT BAR -->
+    <div class="machine-crown">
+      <span class="crown-gem">✦ ✦</span>
+      <span class="crown-title">LUCKY FRUITS</span>
+      <span class="crown-gem">✦ ✦</span>
+    </div>
+
     <div class="jackpot-bar">
       <div class="jp-card jp-grand">
         <span class="jp-label">GRAND</span>
@@ -770,20 +550,13 @@ body::before {
       </div>
     </div>
 
-    <!-- REELS -->
     <div class="reels-outer" id="reelsOuter">
-      <div class="reels" id="reelContainer">
-        <!-- Generated by JS -->
-      </div>
+      <div class="reels" id="reelContainer"></div>
     </div>
 
-    <!-- WIN MESSAGE -->
     <div class="win-msg hint" id="winMsg">🍀 Çevir ve 3 eşit sembol bul — bonus kazan!</div>
 
-    <!-- CONTROLS -->
     <div class="controls">
-
-      <!-- Stats -->
       <div class="stats-row">
         <div class="stat-block">
           <span class="stat-lbl">BAKİYE</span>
@@ -801,7 +574,6 @@ body::before {
         </div>
       </div>
 
-      <!-- Bet buttons -->
       <div class="bet-row">
         <span class="bet-label">BAHİS:</span>
         <div class="bet-buttons" id="betBtns">
@@ -813,466 +585,255 @@ body::before {
         </div>
       </div>
 
-      <!-- Spin -->
       <div class="spin-row">
         <button class="auto-btn" id="autoBtn" onclick="toggleAuto()">OTOMAT<br>İK<br>KAPAL</button>
-        <button class="spin-btn" id="spinBtn" onclick="spin()">▶▶ ÇEVİR</button>
+        <button class="spin-btn" id="spinBtn" onclick="spin()">↻</button>
         <button class="auto-btn" onclick="doMaxBet()">MAKS<br>BAHİS</button>
       </div>
-
     </div>
   </div>
 
-  <!-- FOOTER (inside machine-col) -->
-  <div class="footer" style="margin-top:12px">
+  <div class="footer" style="margin-top:10px">
     Ücretsiz demo slot · Gerçek para içermez<br>
     Bonus için → <a href="https://www.denemebonuscuyuz.com">denemebonuscuyuz.com</a><br>
     18+ Sorumlu oynayın · Kumar bağımlılığı: 182
   </div>
-  </div><!-- /machine-col -->
+  </div>
 
-  <!-- RIGHT: RECENT WINNERS -->
+  <!-- RIGHT: WINNERS -->
   <div class="side-panel">
-    <div class="panel-title">
-      <span class="live-dot"></span>CANLI KAZANANLAR
-    </div>
-    <div class="winners-list" id="winnersList">
-      <!-- populated by JS -->
-    </div>
-
-    <div class="bonus-card" style="margin-top:14px">
+    <div class="panel-title"><span class="live-dot"></span>CANLI KAZANANLAR</div>
+    <div class="winners-list" id="winnersList"></div>
+    <div class="bonus-card" style="margin-top:12px">
       <div class="bonus-card-title">🎁 GERÇEK BONUS AL</div>
-      <div class="bonus-card-text">
-        denemebonuscuyuz.com'da gerçek para bonus al. Yatırım şartsız!
-      </div>
+      <div class="bonus-card-text">denemebonuscuyuz.com'da gerçek para bonus al. Yatırım şartsız!</div>
       <a href="/slot-git" class="bonus-card-btn">💰 GERÇEK KAZANÇLAR İÇİN TIKLA !</a>
     </div>
-
-    <div class="bonus-card" style="margin-top:8px; border-color:#22c55e; background:rgba(34,197,94,.06)">
+    <div class="bonus-card" style="margin-top:8px;border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.04)">
       <div class="bonus-card-title" style="color:#22c55e">⚡ GÜNÜN BONUSU</div>
-      <div class="bonus-card-text">
-        <strong style="color:#f0e8d0">500 TL</strong> çevrimsiz deneme bonusu<br>
-        Yalnızca <strong style="color:#f5c518">bugün</strong> geçerli!
-      </div>
-      <a href="/slot-git" class="bonus-card-btn" style="background:linear-gradient(180deg,#4ade80,#22c55e,#15803d);color:#000">
-        ⚡ BONUSU KAPAT →
-      </a>
+      <div class="bonus-card-text"><strong style="color:#f0e8d0">500 TL</strong> çevrimsiz deneme bonusu<br>Yalnızca <strong style="color:#ffd700">bugün</strong> geçerli!</div>
+      <a href="/slot-git" class="bonus-card-btn" style="background:linear-gradient(180deg,#4ade80,#22c55e,#15803d);color:#000">⚡ BONUSU KAPAT →</a>
     </div>
   </div>
 
-  </div><!-- /layout -->
-
-</div><!-- /page -->
+  </div>
+</div>
 
 <script>
-// ── SEMBOLLER ──────────────────────────────────────────────────────────────
-const SYMS = [
-  { id:'cherry', type:'emoji', val:'🍒', w:6 },
-  { id:'lemon',  type:'emoji', val:'🍋', w:6 },
-  { id:'orange', type:'emoji', val:'🍊', w:5 },
-  { id:'grape',  type:'emoji', val:'🍇', w:5 },
-  { id:'plum',   type:'emoji', val:'🍑', w:4 },
-  { id:'bell',   type:'emoji', val:'🔔', w:3 },
-  { id:'star',   type:'emoji', val:'⭐', w:3 },
-  { id:'bar',    type:'bar',   val:'BAR', w:2 },
-  { id:'seven',  type:'seven', val:'7',   w:1 },
+/* ── SPARKLE BG ── */
+(function(){
+  const c=document.getElementById('sparkleCanvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  let w,h,pts=[];
+  function resize(){w=c.width=window.innerWidth;h=c.height=window.innerHeight}
+  window.addEventListener('resize',resize);resize();
+  function mk(){return{x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.4+.3,a:Math.random(),da:(Math.random()*.008+.003)*(Math.random()>.5?1:-1),dy:-(Math.random()*.25+.04),col:Math.random()>.65?'#ffd700':'rgba(190,130,255,.9)'}}
+  for(let i=0;i<80;i++){const p=mk();p.y=Math.random()*h;pts.push(p)}
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    pts.forEach((p,i)=>{
+      p.a+=p.da;if(p.a>1){p.a=1;p.da=-p.da}if(p.a<0){p.a=0;p.da=-p.da}
+      p.y+=p.dy;if(p.y<-5){pts[i]=mk();pts[i].y=h+5}
+      ctx.globalAlpha=p.a*.75;ctx.fillStyle=p.col;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+    });
+    ctx.globalAlpha=1;requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── SYMBOLS ── */
+const SYMS=[
+  {id:'cherry',type:'emoji',val:'🍒',w:6},
+  {id:'lemon', type:'emoji',val:'🍋',w:6},
+  {id:'orange',type:'emoji',val:'🍊',w:5},
+  {id:'grape', type:'emoji',val:'🍇',w:5},
+  {id:'plum',  type:'emoji',val:'🍑',w:4},
+  {id:'bell',  type:'emoji',val:'🔔',w:3},
+  {id:'star',  type:'emoji',val:'⭐',w:3},
+  {id:'bar',   type:'bar',  val:'BAR',w:2},
+  {id:'seven', type:'seven',val:'7', w:1},
 ];
+const REELS=5,ROWS=3,CELL_H=80;
 
-const REELS = 5;
-const ROWS  = 3;
-const CELL_H = 68; // synced with CSS
+let balance=10000,bet=50,lastWin=0,spinCount=0,isSpinning=false,currentGrid=[];
+let grandVal=527380,majorVal=69929;
 
-// ── GAME STATE ──────────────────────────────────────────────────────────────
-let balance   = 10000;
-let bet       = 50;
-let lastWin   = 0;
-let spinCount = 0;
-let isSpinning = false;
-let autoPlay  = false;
-let autoTimer = null;
-let currentGrid = []; // [col][row] = sym
+setInterval(()=>{
+  grandVal+=Math.floor(Math.random()*40+10);
+  majorVal+=Math.floor(Math.random()*15+3);
+  document.getElementById('grandAmt').textContent=fmtNum(grandVal);
+  document.getElementById('majorAmt').textContent=fmtNum(majorVal);
+},1200);
 
-// ── JACKPOT TICKER ──────────────────────────────────────────────────────────
-let grandVal = 527380, majorVal = 69929;
-setInterval(() => {
-  grandVal += Math.floor(Math.random() * 40 + 10);
-  majorVal += Math.floor(Math.random() * 15 + 3);
-  document.getElementById('grandAmt').textContent = fmtNum(grandVal);
-  document.getElementById('majorAmt').textContent = fmtNum(majorVal);
-}, 1200);
-
-// ── HELPERS ─────────────────────────────────────────────────────────────────
-function fmtNum(n) {
-  return n.toLocaleString('tr-TR').replace(',', ' ').replace('.', ' ');
+function fmtNum(n){return n.toLocaleString('tr-TR').replace(',','').replace('.','')}
+function weightedRandom(){
+  const tot=SYMS.reduce((s,x)=>s+x.w,0);let r=Math.random()*tot;
+  for(const s of SYMS){r-=s.w;if(r<=0)return s}return SYMS[0];
 }
-function weightedRandom() {
-  const total = SYMS.reduce((s,x) => s + x.w, 0);
-  let r = Math.random() * total;
-  for (const s of SYMS) { r -= s.w; if (r <= 0) return s; }
-  return SYMS[0];
-}
-function randExcept(ex) {
-  let s; do { s = weightedRandom(); } while (s.id === ex.id); return s;
-}
+function randExcept(ex){let s;do{s=weightedRandom()}while(s.id===ex.id);return s}
 
-// ── BUILD DOM ────────────────────────────────────────────────────────────────
-function buildReels() {
-  const container = document.getElementById('reelContainer');
-  container.innerHTML = '';
-  for (let c = 0; c < REELS; c++) {
-    const reel = document.createElement('div');
-    reel.className = 'reel';
-    reel.id = 'reel' + c;
-    for (let r = 0; r < ROWS; r++) {
-      const cell = document.createElement('div');
-      const cls  = r === 0 ? 'top' : r === 1 ? 'mid' : 'bot';
-      cell.className = 'sym-cell ' + cls;
-      cell.id = `cell-${c}-${r}`;
-      reel.appendChild(cell);
+function buildReels(){
+  const con=document.getElementById('reelContainer');con.innerHTML='';
+  for(let c=0;c<REELS;c++){
+    const reel=document.createElement('div');reel.className='reel';reel.id='reel'+c;
+    for(let r=0;r<ROWS;r++){
+      const cell=document.createElement('div');
+      cell.className='sym-cell '+(r===0?'top':r===1?'mid':'bot');
+      cell.id=`cell-${c}-${r}`;reel.appendChild(cell);
     }
-    container.appendChild(reel);
+    con.appendChild(reel);
   }
 }
 
-function renderCell(c, r, sym) {
-  const cell = document.getElementById(`cell-${c}-${r}`);
-  if (!cell) return;
-  cell.innerHTML = '';
-  if (sym.type === 'bar') {
-    cell.innerHTML = `<span class="bar-label">BAR</span>`;
-  } else if (sym.type === 'seven') {
-    cell.innerHTML = `<span class="seven-label">7</span>`;
-  } else {
-    cell.textContent = sym.val;
-  }
+function renderCell(c,r,sym){
+  const cell=document.getElementById(`cell-${c}-${r}`);if(!cell)return;
+  cell.innerHTML='';
+  if(sym.type==='bar')cell.innerHTML=`<span class="bar-label">BAR</span>`;
+  else if(sym.type==='seven')cell.innerHTML=`<span class="seven-label">7</span>`;
+  else cell.innerHTML=`<span class="sym-emoji">${sym.val}</span>`;
 }
 
-function initGrid() {
-  currentGrid = [];
-  for (let c = 0; c < REELS; c++) {
-    const col = [];
-    for (let r = 0; r < ROWS; r++) {
-      col.push(weightedRandom());
-    }
+function initGrid(){
+  currentGrid=[];
+  for(let c=0;c<REELS;c++){
+    const col=[];
+    for(let r=0;r<ROWS;r++)col.push(weightedRandom());
     currentGrid.push(col);
-    for (let r = 0; r < ROWS; r++) renderCell(c, r, col[r]);
+    for(let r=0;r<ROWS;r++)renderCell(c,r,col[r]);
   }
 }
 
-// ── WIN LINE HIGHLIGHT ───────────────────────────────────────────────────────
-function clearHighlights() {
-  document.querySelectorAll('.sym-cell').forEach(c => c.classList.remove('win-cell'));
+function clearHighlights(){
+  document.querySelectorAll('.sym-cell').forEach(c=>c.classList.remove('win-cell'));
   document.getElementById('reelsOuter').classList.remove('win-glow');
 }
-function highlightMiddle() {
-  for (let c = 0; c < REELS; c++) {
-    document.getElementById(`cell-${c}-1`).classList.add('win-cell');
-  }
-  document.getElementById('reelsOuter').classList.add('win-glow');
-}
-function highlightFirst3() {
-  for (let c = 0; c < 3; c++) {
-    document.getElementById(`cell-${c}-1`).classList.add('win-cell');
-  }
-  document.getElementById('reelsOuter').classList.add('win-glow');
-}
+function highlightMiddle(){for(let c=0;c<REELS;c++)document.getElementById(`cell-${c}-1`).classList.add('win-cell');document.getElementById('reelsOuter').classList.add('win-glow')}
+function highlightFirst3(){for(let c=0;c<3;c++)document.getElementById(`cell-${c}-1`).classList.add('win-cell');document.getElementById('reelsOuter').classList.add('win-glow')}
 
-// ── DETERMINE OUTCOME ────────────────────────────────────────────────────────
-function determineGrid(spinNum) {
-  const g = Array.from({length: REELS}, () => Array(ROWS).fill(null));
-
-  if (spinNum === 1) {
-    // Near miss: first 2 reels match in middle
-    const sym = weightedRandom();
-    g[0][1] = sym; g[1][1] = sym;
-    g[2][1] = randExcept(sym);
-    g[3][1] = randExcept(sym); g[4][1] = randExcept(sym);
-  } else if (spinNum === 2) {
-    // Small win: 3 match in middle
-    const sym = SYMS[Math.floor(Math.random() * 5)]; // low/mid symbols
-    g[0][1] = sym; g[1][1] = sym; g[2][1] = sym;
-    g[3][1] = randExcept(sym); g[4][1] = randExcept(sym);
-  } else {
-    // BIG WIN: all 5 middle = lucky 7
-    const sym = SYMS.find(s => s.id === 'seven');
-    for (let c = 0; c < REELS; c++) g[c][1] = sym;
-  }
-
-  // Fill top/bottom randomly
-  for (let c = 0; c < REELS; c++) {
-    g[c][0] = weightedRandom();
-    g[c][2] = weightedRandom();
-  }
+function determineGrid(n){
+  const g=Array.from({length:REELS},()=>Array(ROWS).fill(null));
+  if(n===1){const s=weightedRandom();g[0][1]=s;g[1][1]=s;g[2][1]=randExcept(s);g[3][1]=randExcept(s);g[4][1]=randExcept(s)}
+  else if(n===2){const s=SYMS[Math.floor(Math.random()*5)];g[0][1]=s;g[1][1]=s;g[2][1]=s;g[3][1]=randExcept(s);g[4][1]=randExcept(s)}
+  else{const s=SYMS.find(x=>x.id==='seven');for(let c=0;c<REELS;c++)g[c][1]=s}
+  for(let c=0;c<REELS;c++){g[c][0]=weightedRandom();g[c][2]=weightedRandom()}
   return g;
 }
 
-// ── SPIN REEL ANIMATION ───────────────────────────────────────────────────────
-function animateReel(colIdx, duration, finalCol, onDone) {
-  const reelEl = document.getElementById('reel' + colIdx);
-  reelEl.classList.add('spinning');
-
-  const iv = setInterval(() => {
-    for (let r = 0; r < ROWS; r++) {
-      renderCell(colIdx, r, weightedRandom());
-    }
-  }, 75);
-
-  setTimeout(() => {
-    clearInterval(iv);
-    reelEl.classList.remove('spinning');
-    // Set final result
-    for (let r = 0; r < ROWS; r++) {
-      renderCell(colIdx, r, finalCol[r]);
-    }
-    reelEl.classList.add('stopping');
-    setTimeout(() => reelEl.classList.remove('stopping'), 280);
-    if (onDone) onDone();
-  }, duration);
+function animateReel(col,dur,finalCol,cb){
+  const el=document.getElementById('reel'+col);el.classList.add('spinning');
+  const iv=setInterval(()=>{for(let r=0;r<ROWS;r++)renderCell(col,r,weightedRandom())},75);
+  setTimeout(()=>{
+    clearInterval(iv);el.classList.remove('spinning');
+    for(let r=0;r<ROWS;r++)renderCell(col,r,finalCol[r]);
+    el.classList.add('stopping');setTimeout(()=>el.classList.remove('stopping'),280);
+    if(cb)cb();
+  },dur);
 }
 
-// ── MAIN SPIN ────────────────────────────────────────────────────────────────
-function spin() {
-  if (isSpinning) return;
-  if (balance < bet) {
-    setWinMsg('❌ Yetersiz bakiye!', 'miss');
-    return;
-  }
-
-  isSpinning = true;
-  clearHighlights();
-  balance -= bet;
-  spinCount++;
-  lastWin = 0;
-  updateDisplay();
-  setWinMsg('🎰 Çekiliyor...', '');
-
-  const setSpinUI = true;
-  document.getElementById('spinBtn').disabled = true;
-  document.getElementById('spinBtn').classList.add('spinning-state');
-  document.getElementById('spinBtn').textContent = '⏳ ...';
+function spin(){
+  if(isSpinning)return;
+  if(balance<bet){setWinMsg('❌ Yetersiz bakiye!','miss');return}
+  isSpinning=true;clearHighlights();balance-=bet;spinCount++;lastWin=0;updateDisplay();setWinMsg('🎰 Çekiliyor...','');
+  const btn=document.getElementById('spinBtn');
+  btn.disabled=true;btn.classList.add('spinning-state');btn.textContent='⌛';
   setBetBtnsEnabled(false);
-
-  const newGrid = determineGrid(spinCount);
-  const stopDelays = [600, 800, 1000, 1200, 1400]; // each reel stops at these ms
-
-  for (let c = 0; c < REELS; c++) {
-    const duration = stopDelays[c];
-    animateReel(c, duration, newGrid[c], null);
-  }
-
-  // After all reels stopped
-  const totalMs = stopDelays[REELS - 1] + 350;
-  setTimeout(() => {
-    currentGrid = newGrid;
-    handleResult(spinCount);
-
-    isSpinning = false;
-    document.getElementById('spinBtn').disabled = false;
-    document.getElementById('spinBtn').classList.remove('spinning-state');
-    document.getElementById('spinBtn').textContent = '▶▶ ÇEVİR';
+  const ng=determineGrid(spinCount);
+  const stops=[600,800,1000,1200,1400];
+  for(let c=0;c<REELS;c++)animateReel(c,stops[c],ng[c],null);
+  setTimeout(()=>{
+    currentGrid=ng;handleResult(spinCount);
+    isSpinning=false;btn.disabled=false;btn.classList.remove('spinning-state');btn.textContent='↻';
     setBetBtnsEnabled(true);
-  }, totalMs);
+  },stops[REELS-1]+350);
 }
 
-function handleResult(spinNum) {
-  if (spinNum === 1) {
-    // Near miss
-    setWinMsg('😅 Neredeyse! Tekrar dene...', 'miss');
-  } else if (spinNum === 2) {
-    // Small win — 3 match
-    const winAmt = bet * 5;
-    balance += winAmt;
-    lastWin = winAmt;
-    updateDisplay();
-    highlightFirst3();
-    setWinMsg(`🎉 +${fmtNum(winAmt)} TL — Harika! Bir daha çevir!`, 'small');
-  } else {
-    // BIG WIN
-    const winAmt = bet * 100;
-    balance += winAmt;
-    lastWin = winAmt;
-    updateDisplay();
-    highlightMiddle();
-    setWinMsg(`🏆 BÜYÜK KAZANÇ! +${fmtNum(winAmt)} TL`, 'big');
-
-    // Show overlay after 1.2s
-    setTimeout(() => {
-      document.getElementById('bigWinAmount').innerHTML =
-        `<small>+</small>${fmtNum(winAmt)} <small>TL</small>`;
+function handleResult(n){
+  if(n===1){setWinMsg('😅 Neredeyse! Tekrar dene...','miss')}
+  else if(n===2){
+    const w=bet*5;balance+=w;lastWin=w;updateDisplay();highlightFirst3();
+    setWinMsg(`🎉 +${fmtNum(w)} TL — Harika! Bir daha çevir!`,'small');
+  }else{
+    const w=bet*100;balance+=w;lastWin=w;updateDisplay();highlightMiddle();
+    setWinMsg(`🏆 BÜYÜK KAZANÇ! +${fmtNum(w)} TL`,'big');
+    setTimeout(()=>{
+      document.getElementById('bigWinAmount').textContent=`+${fmtNum(w)} TL`;
       launchConfetti();
       document.getElementById('bigWinOverlay').classList.add('show');
       startCountdown();
-    }, 1200);
+    },1200);
   }
 }
 
-// ── UI HELPERS ─────────────────────────────────────────────────────────────
-function updateDisplay() {
-  document.getElementById('balDisplay').textContent = fmtNum(balance);
-  document.getElementById('betDisplay').textContent = fmtNum(bet);
-  document.getElementById('winDisplay').textContent = lastWin > 0 ? '+' + fmtNum(lastWin) : '0';
+function updateDisplay(){
+  document.getElementById('balDisplay').textContent=fmtNum(balance);
+  document.getElementById('betDisplay').textContent=fmtNum(bet);
+  document.getElementById('winDisplay').textContent=lastWin>0?'+'+fmtNum(lastWin):'0';
+}
+function setWinMsg(t,cls){const e=document.getElementById('winMsg');e.textContent=t;e.className='win-msg '+(cls||'')}
+function setBet(v){bet=v;document.querySelectorAll('.bet-btn').forEach(b=>b.classList.toggle('active',parseInt(b.textContent)===v));updateDisplay()}
+function doMaxBet(){[10,20,30,50,100].reverse().find(v=>{if(v<=balance){setBet(v);return true}})}
+function setBetBtnsEnabled(ok){document.querySelectorAll('.bet-btn').forEach(b=>b.disabled=!ok)}
+
+let autoOn=false,autoTimer=null;
+function toggleAuto(){
+  autoOn=!autoOn;const btn=document.getElementById('autoBtn');
+  if(autoOn){btn.innerHTML='OTOMAT<br>İK<br>AÇIK';btn.style.color='#ffd700';btn.style.borderColor='#d4af37';autoTimer=setInterval(()=>{if(!isSpinning&&spinCount<3)spin();else if(spinCount>=3)toggleAuto()},2200)}
+  else{btn.innerHTML='OTOMAT<br>İK<br>KAPAL';btn.style.color='';btn.style.borderColor='';clearInterval(autoTimer)}
 }
 
-function setWinMsg(text, cls) {
-  const el = document.getElementById('winMsg');
-  el.textContent = text;
-  el.className = 'win-msg ' + (cls || '');
+function startCountdown(){
+  let s=5;const el=document.getElementById('countdown');
+  const iv=setInterval(()=>{s--;el.textContent=s;if(s<=0){clearInterval(iv);window.location.href='/slot-git'}},1000);
 }
 
-function setBet(val) {
-  bet = val;
-  document.querySelectorAll('.bet-btn').forEach(b => {
-    b.classList.toggle('active', parseInt(b.textContent) === val);
-  });
-  updateDisplay();
+function launchConfetti(){
+  const cols=['#ffd700','#f97316','#ef4444','#22c55e','#3b82f6','#a855f7','#fff'];
+  for(let i=0;i<120;i++)setTimeout(()=>{
+    const p=document.createElement('div');p.className='conf';
+    p.style.left=Math.random()*100+'vw';p.style.background=cols[Math.floor(Math.random()*cols.length)];
+    p.style.width=(Math.random()*9+5)+'px';p.style.height=(Math.random()*9+5)+'px';
+    p.style.borderRadius=Math.random()>.5?'50%':'2px';p.style.animationDuration=(Math.random()*2.5+1.5)+'s';
+    document.body.appendChild(p);setTimeout(()=>p.remove(),4000);
+  },i*20);
 }
 
-function doMaxBet() {
-  const bets = [10, 20, 30, 50, 100];
-  for (let i = bets.length - 1; i >= 0; i--) {
-    if (bets[i] <= balance) { setBet(bets[i]); break; }
-  }
+/* ── CANLI KAZANANLAR ── */
+const FNAMES=['Mehmet A.','Selin K.','Burak T.','Ayşe Y.','Kemal D.','Zeynep Ö.','Hakan S.','Fatma B.','Emre C.','Gül N.','Serkan M.','Dilek A.','Berk Ü.','Esra T.','Okan R.','Merve K.','Tarık H.','Şule Y.','Can E.','Aslı B.'];
+const WSYMS=[{sym:'🍒',name:'Kiraz',mult:2},{sym:'🍋',name:'Limon',mult:3},{sym:'🍊',name:'Portakal',mult:5},{sym:'🍇',name:'Üzüm',mult:10},{sym:'⭐',name:'Yıldız',mult:20},{sym:'🔔',name:'Çan',mult:15},{sym:'BAR',name:'Bar',mult:30},{sym:'7',name:'Yedi',mult:100}];
+const BETS=[10,20,30,50,100];
+
+function avatarHtml(sym){
+  if(sym==='BAR')return`<span style="font-size:7px;font-weight:900;color:#ffd700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px">BAR</span>`;
+  if(sym==='7')return`<span style="font-size:14px;font-weight:900;color:#ff3300">7</span>`;
+  return sym;
+}
+function addWinner(){
+  const list=document.getElementById('winnersList');if(!list)return;
+  const nm=FNAMES[Math.floor(Math.random()*FNAMES.length)];
+  const ws=WSYMS[Math.floor(Math.random()*WSYMS.length)];
+  const b=BETS[Math.floor(Math.random()*BETS.length)];
+  const amt=b*ws.mult;const ago=Math.floor(Math.random()*55+5)+'s önce';
+  const el=document.createElement('div');el.className='winner-item new';
+  el.innerHTML=`<div class="w-avatar">${avatarHtml(ws.sym)}</div><div class="w-info"><div class="w-name">${nm}</div><div class="w-sym">${ws.name} · ${ago}</div></div><div class="w-amt">+${amt.toLocaleString('tr-TR')} TL</div>`;
+  list.insertBefore(el,list.firstChild);setTimeout(()=>el.classList.remove('new'),500);
+  while(list.children.length>8)list.removeChild(list.lastChild);
 }
 
-function setBetBtnsEnabled(enabled) {
-  document.querySelectorAll('.bet-btn').forEach(b => b.disabled = !enabled);
-}
-
-let autoOn = false;
-function toggleAuto() {
-  autoOn = !autoOn;
-  const btn = document.getElementById('autoBtn');
-  if (autoOn) {
-    btn.textContent = 'OTOMAT\nİK\nAÇIK';
-    btn.style.color = '#f5c518';
-    btn.style.borderColor = '#c8a020';
-    autoTimer = setInterval(() => {
-      if (!isSpinning && spinCount < 3) spin();
-      else if (spinCount >= 3) { toggleAuto(); } // stop after big win
-    }, 2200);
-  } else {
-    btn.innerHTML = 'OTOMAT<br>İK<br>KAPAL';
-    btn.style.color = '';
-    btn.style.borderColor = '';
-    clearInterval(autoTimer);
-  }
-}
-
-// ── COUNTDOWN & REDIRECT ───────────────────────────────────────────────────
-function startCountdown() {
-  let secs = 5;
-  const el = document.getElementById('countdown');
-  const iv = setInterval(() => {
-    secs--;
-    el.textContent = secs;
-    if (secs <= 0) {
-      clearInterval(iv);
-      window.location.href = '/slot-git';
-    }
-  }, 1000);
-}
-
-// ── CONFETTI ───────────────────────────────────────────────────────────────
-function launchConfetti() {
-  const colors = ['#f5c518','#f97316','#ef4444','#22c55e','#3b82f6','#a855f7','#fff'];
-  for (let i = 0; i < 100; i++) {
-    setTimeout(() => {
-      const p = document.createElement('div');
-      p.className = 'conf';
-      p.style.left = Math.random() * 100 + 'vw';
-      p.style.background = colors[Math.floor(Math.random() * colors.length)];
-      p.style.width  = (Math.random() * 8 + 5) + 'px';
-      p.style.height = (Math.random() * 8 + 5) + 'px';
-      p.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
-      p.style.animationDuration = (Math.random() * 2.5 + 1.5) + 's';
-      document.body.appendChild(p);
-      setTimeout(() => p.remove(), 4000);
-    }, i * 25);
-  }
-}
-
-// ── CANLI KAZANANLAR ────────────────────────────────────────────────────────
-const FAKE_NAMES = [
-  'Mehmet A.','Selin K.','Burak T.','Ayşe Y.','Kemal D.',
-  'Zeynep Ö.','Hakan S.','Fatma B.','Emre C.','Gül N.',
-  'Serkan M.','Dilek A.','Berk Ü.','Esra T.','Okan R.',
-  'Merve K.','Tarık H.','Şule Y.','Can E.','Aslı B.',
-];
-const WIN_SYMS = [
-  { sym:'🍒', name:'Kiraz',  mult:2 },
-  { sym:'🍋', name:'Limon',  mult:3 },
-  { sym:'🍊', name:'Portakal', mult:5 },
-  { sym:'🍇', name:'Üzüm',  mult:10 },
-  { sym:'⭐', name:'Yıldız', mult:20 },
-  { sym:'🔔', name:'Çan',   mult:15 },
-  { sym:'BAR',name:'Bar',   mult:30 },
-  { sym:'7',  name:'Yedi',  mult:100 },
-];
-const BETS = [10,20,30,50,100];
-
-function addWinner() {
-  const list = document.getElementById('winnersList');
-  if (!list) return;
-  const name = FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)];
-  const ws   = WIN_SYMS[Math.floor(Math.random() * WIN_SYMS.length)];
-  const bet  = BETS[Math.floor(Math.random() * BETS.length)];
-  const amt  = bet * ws.mult;
-  const ago  = Math.floor(Math.random() * 55 + 5) + 's önce';
-
-  const el = document.createElement('div');
-  el.className = 'winner-item new';
-  el.innerHTML = `
-    <div class="w-avatar">${ws.sym === 'BAR' ? '<span style="font-size:8px;font-weight:900;color:#f5c518">BAR</span>' : ws.sym === '7' ? '<span style="font-size:14px;font-weight:900;color:#ff4444">7</span>' : ws.sym}</div>
-    <div class="w-info">
-      <div class="w-name">${name}</div>
-      <div class="w-sym">${ws.name} · ${ago}</div>
-    </div>
-    <div class="w-amt">+${amt.toLocaleString('tr-TR')} TL</div>
-  `;
-  list.insertBefore(el, list.firstChild);
-  setTimeout(() => el.classList.remove('new'), 500);
-
-  // Keep max 8
-  while (list.children.length > 8) list.removeChild(list.lastChild);
-}
-
-// Seed initial winners
-const seedData = [
-  { name:'Selin K.',  ws:WIN_SYMS[7], bet:50  },
-  { name:'Mehmet A.', ws:WIN_SYMS[5], bet:100 },
-  { name:'Burak T.',  ws:WIN_SYMS[4], bet:30  },
-  { name:'Ayşe Y.',   ws:WIN_SYMS[6], bet:50  },
-  { name:'Emre C.',   ws:WIN_SYMS[2], bet:20  },
-  { name:'Zeynep Ö.', ws:WIN_SYMS[3], bet:100 },
-];
-function seedWinners() {
-  const list = document.getElementById('winnersList');
-  if (!list) return;
-  seedData.forEach((d, i) => {
-    const amt = d.bet * d.ws.mult;
-    const ago = (i*2 + 1) + 'dk önce';
-    const el = document.createElement('div');
-    el.className = 'winner-item';
-    el.innerHTML = `
-      <div class="w-avatar">${d.ws.sym === 'BAR' ? '<span style="font-size:8px;font-weight:900;color:#f5c518">BAR</span>' : d.ws.sym === '7' ? '<span style="font-size:14px;font-weight:900;color:#ff4444">7</span>' : d.ws.sym}</div>
-      <div class="w-info">
-        <div class="w-name">${d.name}</div>
-        <div class="w-sym">${d.ws.name} · ${ago}</div>
-      </div>
-      <div class="w-amt">+${amt.toLocaleString('tr-TR')} TL</div>
-    `;
+const SEED=[{n:'Selin K.',ws:WSYMS[7],b:50},{n:'Mehmet A.',ws:WSYMS[5],b:100},{n:'Burak T.',ws:WSYMS[4],b:30},{n:'Ayşe Y.',ws:WSYMS[6],b:50},{n:'Emre C.',ws:WSYMS[2],b:20},{n:'Zeynep Ö.',ws:WSYMS[3],b:100}];
+(function seedWinners(){
+  const list=document.getElementById('winnersList');if(!list)return;
+  SEED.forEach((d,i)=>{
+    const el=document.createElement('div');el.className='winner-item';
+    el.innerHTML=`<div class="w-avatar">${avatarHtml(d.ws.sym)}</div><div class="w-info"><div class="w-name">${d.n}</div><div class="w-sym">${d.ws.name} · ${(i*2+1)}dk önce</div></div><div class="w-amt">+${(d.b*d.ws.mult).toLocaleString('tr-TR')} TL</div>`;
     list.appendChild(el);
   });
-}
-seedWinners();
-// Add new winner every 8-14 seconds
-setInterval(addWinner, Math.random() * 6000 + 8000);
-setInterval(addWinner, Math.random() * 6000 + 12000);
+})();
+setInterval(addWinner,Math.random()*6000+8000);
+setInterval(addWinner,Math.random()*6000+12000);
 
-// ── INIT ────────────────────────────────────────────────────────────────────
-buildReels();
-initGrid();
-updateDisplay();
+buildReels();initGrid();updateDisplay();
 </script>
 </body>
 </html>
