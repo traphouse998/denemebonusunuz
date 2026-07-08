@@ -435,5 +435,11 @@ def iletisim():
     return render_template("iletisim.html")
 
 
+@app.route("/bonanza")
+def bonanza():
+    log_click(None, "bonanza-slot")
+    return render_template("bonanza.html")
+
+
 if __name__ == "__main__":
     app.run(debug=False)

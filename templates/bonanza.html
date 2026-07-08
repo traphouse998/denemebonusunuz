@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Sweet Bonanza 2500 — Demo Slot</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+html,body{
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+  background: linear-gradient(160deg, #ffcce8 0%, #f0a0d8 20%, #d870c8 40%, #a050b8 60%, #7030a8 80%, #501890 100%);
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* candy stripe animated top/bottom borders */
+body::before,body::after{
+  content:'';position:fixed;left:0;right:0;height:16px;z-index:100;
+  background:repeating-linear-gradient(90deg,#ff69b4 0px,#ff69b4 20px,#fff 20px,#fff 40px,#ff9fcc 40px,#ff9fcc 60px,#fff 60px,#fff 80px);
+}
+body::before{top:0}
+body::after{bottom:0}
+
+.page{padding:20px 12px 32px;max-width:700px;margin:0 auto;position:relative}
+
+/* ── TITLE ── */
+.title-wrap{text-align:center;margin-bottom:12px;margin-top:4px}
+.title-main{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(28px,5vw,52px);
+  letter-spacing:2px;
+  background:linear-gradient(90deg,#ffeb3b 0%,#ff9800 15%,#f44336 30%,#e91e63 45%,#9c27b0 60%,#2196f3 75%,#00bcd4 90%,#ffeb3b 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(2px 4px 0px rgba(0,0,0,0.35));
+  line-height:1;
+}
+.title-sub{font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:3px;text-transform:uppercase;margin-top:3px}
+
+/* ── MACHINE FRAME ── */
+.machine-frame{
+  background:linear-gradient(180deg,rgba(255,255,255,0.18) 0%,rgba(255,255,255,0.08) 100%);
+  border:4px solid rgba(255,255,255,0.6);
+  border-radius:22px;
+  padding:12px;
+  box-shadow:0 12px 40px rgba(100,0,150,0.4),inset 0 2px 0 rgba(255,255,255,0.5);
+}
+
+/* ── MULTIPLIER DISPLAY ── */
+.mult-area{
+  min-height:64px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:8px;
+}
+.mult-badge{
+  display:none;
+  background:linear-gradient(135deg,#ffd700,#ff8c00);
+  border:3px solid #fff;
+  border-radius:50px;
+  padding:6px 24px;
+  font-family:'Fredoka One',cursive;
+  font-size:38px;
+  color:#fff;
+  box-shadow:0 6px 20px rgba(255,140,0,0.6),0 0 0 4px rgba(255,215,0,0.3);
+  animation:multPop 0.4s cubic-bezier(.34,1.56,.64,1);
+  text-shadow:2px 3px 0 rgba(0,0,0,0.3);
+}
+.mult-badge.show{display:block}
+@keyframes multPop{from{transform:scale(0.3) rotate(-10deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
+
+/* cascade win info */
+.cascade-info{
+  display:flex;flex-wrap:wrap;gap:5px;justify-content:center;
+  min-height:28px;margin-bottom:8px;
+}
+.win-chip{
+  background:rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.5);
+  border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700;color:#fff;
+  display:flex;align-items:center;gap:5px;
+  animation:chipIn .3s ease;
+}
+@keyframes chipIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.win-chip .chip-sym{font-size:16px}
+.win-chip .chip-amt{color:#ffd700}
+
+/* ── GRID ── */
+.grid-outer{
+  background:linear-gradient(160deg,#b0d8ff 0%,#e0c8ff 50%,#ffc8e8 100%);
+  border:5px solid #ff80c8;
+  border-radius:18px;
+  padding:8px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.3),inset 0 0 20px rgba(255,255,255,0.2);
+  position:relative;
+}
+/* pink candy-stripe border inner */
+.grid-outer::before{
+  content:'';position:absolute;
+  top:3px;left:3px;right:3px;bottom:3px;
+  border:3px solid rgba(255,150,200,0.4);
+  border-radius:14px;pointer-events:none;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:5px;
+}
+
+/* ── SYMBOL CELLS ── */
+.gc{
+  aspect-ratio:1;
+  padding:4px;
+  position:relative;
+}
+.sym{
+  width:100%;height:100%;
+  border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(28px,5vw,42px);
+  position:relative;
+  border:3px solid rgba(255,255,255,0.55);
+  box-shadow:0 5px 12px rgba(0,0,0,0.25),inset 0 3px 0 rgba(255,255,255,0.65),inset 0 -2px 0 rgba(0,0,0,0.15);
+  overflow:hidden;
+  transition:transform 0.15s;
+}
+/* glossy highlight */
+.sym::before{
+  content:'';position:absolute;
+  top:5px;left:10%;right:10%;height:40%;
+  background:radial-gradient(ellipse,rgba(255,255,255,0.7) 0%,rgba(255,255,255,0.1) 100%);
+  border-radius:50%;pointer-events:none;
+}
+
+/* symbol backgrounds */
+.s-heart  {background:linear-gradient(145deg,#ff8cb4,#d81b60)}
+.s-pink   {background:linear-gradient(145deg,#f8bbd0,#e91e63)}
+.s-grape  {background:linear-gradient(145deg,#ce93d8,#6a1b9a)}
+.s-apple  {background:linear-gradient(145deg,#ff8a80,#b71c1c)}
+.s-blue   {background:linear-gradient(145deg,#90caf9,#1565c0)}
+.s-green  {background:linear-gradient(145deg,#a5d6a7,#2e7d32)}
+.s-banana {background:linear-gradient(145deg,#fff9c4,#f9a825)}
+.s-scatter{background:linear-gradient(145deg,#ff80ab,#c2185b);border-color:gold!important;box-shadow:0 0 12px rgba(255,215,0,0.8),0 5px 12px rgba(0,0,0,0.25),inset 0 3px 0 rgba(255,255,255,0.65)!important}
+
+/* win state */
+.sym.winning{
+  animation:symWin 0.5s ease infinite alternate;
+  z-index:2;
+}
+@keyframes symWin{
+  from{transform:scale(1);box-shadow:0 0 0 3px rgba(255,215,0,0.6),0 5px 12px rgba(0,0,0,0.25),inset 0 3px 0 rgba(255,255,255,0.65)}
+  to  {transform:scale(1.12);box-shadow:0 0 0 6px rgba(255,215,0,1),0 0 25px rgba(255,215,0,0.8),inset 0 3px 0 rgba(255,255,255,0.65)}
+}
+
+.sym.exploding{animation:symExplode 0.35s ease forwards}
+@keyframes symExplode{
+  0%  {transform:scale(1.15);opacity:1}
+  60% {transform:scale(1.5);opacity:0.5}
+  100%{transform:scale(0);opacity:0}
+}
+
+.gc.new-sym .sym{animation:symDrop 0.4s cubic-bezier(.25,.46,.45,.94)}
+@keyframes symDrop{
+  from{transform:translateY(-120px) scaleY(0.6);opacity:0}
+  to  {transform:translateY(0) scaleY(1);opacity:1}
+}
+
+/* ── SCATTER GLOW ── */
+.sym.scatter-glow{animation:scatterGlow 0.8s ease infinite alternate}
+@keyframes scatterGlow{
+  from{box-shadow:0 0 10px rgba(255,215,0,0.8),0 5px 12px rgba(0,0,0,0.25)}
+  to  {box-shadow:0 0 30px rgba(255,215,0,1),0 0 60px rgba(255,100,0,0.6)}
+}
+
+/* ── CONTROLS ── */
+.controls{margin-top:12px;display:flex;flex-direction:column;gap:9px}
+
+.stats-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(0,0,0,0.35);border:2px solid rgba(255,255,255,0.3);
+  border-radius:50px;padding:8px 20px;
+}
+.stat-item{text-align:center}
+.stat-lbl{font-size:10px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px;display:block}
+.stat-val{font-size:20px;font-weight:900;color:#fff;display:block}
+.stat-val.green{color:#69ff94}
+.stat-sep{width:1px;height:30px;background:rgba(255,255,255,0.2)}
+
+.bet-bar{display:flex;align-items:center;gap:6px;justify-content:center}
+.bet-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:1px}
+.bet-buttons{display:flex;gap:5px}
+.bet-btn{
+  padding:8px 14px;
+  background:rgba(255,255,255,0.15);
+  border:2px solid rgba(255,255,255,0.3);
+  border-radius:20px;color:#fff;
+  font-size:13px;font-weight:800;
+  cursor:pointer;transition:all .15s;
+}
+.bet-btn:hover{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.6)}
+.bet-btn.active{background:rgba(255,215,0,0.3);border-color:#ffd700;color:#ffd700;box-shadow:0 0 10px rgba(255,215,0,0.3)}
+.bet-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.spin-row{display:flex;align-items:center;justify-content:center;gap:16px}
+
+/* round spin button */
+.spin-btn{
+  width:92px;height:92px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff8a0,#ffd700 45%,#e65c00 100%);
+  border:5px solid #fff;color:#a02000;
+  font-size:46px;font-weight:900;
+  cursor:pointer;
+  box-shadow:0 0 0 3px rgba(255,140,0,0.4),0 8px 25px rgba(255,100,0,0.5),inset 0 3px 0 rgba(255,255,255,0.5);
+  transition:transform .1s;
+  animation:spinIdle 2.5s ease infinite;
+  position:relative;overflow:hidden;
+}
+.spin-btn::before{content:'';position:absolute;top:8%;left:10%;width:80%;height:42%;background:radial-gradient(ellipse,rgba(255,255,255,0.5) 0%,transparent 80%);border-radius:50%;pointer-events:none}
+@keyframes spinIdle{
+  0%,100%{box-shadow:0 0 0 3px rgba(255,140,0,0.4),0 8px 25px rgba(255,100,0,0.5),inset 0 3px 0 rgba(255,255,255,0.5)}
+  50%    {box-shadow:0 0 0 6px rgba(255,215,0,0.6),0 10px 35px rgba(255,100,0,0.7),inset 0 3px 0 rgba(255,255,255,0.5)}
+}
+.spin-btn:hover{transform:scale(1.06)}
+.spin-btn:active{transform:scale(0.96)}
+.spin-btn:disabled{opacity:.55;animation:none;cursor:not-allowed;transform:none}
+.spin-btn.busy{background:radial-gradient(circle,#555,#222);color:#888;border-color:#444;animation:none}
+
+.side-btn{
+  padding:10px 16px;
+  background:rgba(255,255,255,0.15);
+  border:2px solid rgba(255,255,255,0.3);
+  border-radius:14px;color:#fff;
+  font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .15s;text-align:center;line-height:1.4;
+}
+.side-btn:hover{background:rgba(255,255,255,0.25)}
+.side-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* win message */
+.win-msg{
+  text-align:center;font-size:14px;font-weight:800;color:rgba(255,255,255,0.8);
+  min-height:22px;letter-spacing:.5px;
+}
+.win-msg.big{color:#ffd700;font-size:18px;animation:flash .4s ease infinite alternate}
+.win-msg.good{color:#69ff94}
+.win-msg.miss{color:rgba(255,255,255,0.5);font-size:12px}
+@keyframes flash{from{opacity:1}to{opacity:.3}}
+
+/* footer */
+.footer{text-align:center;font-size:10px;color:rgba(255,255,255,0.45);line-height:1.7;margin-top:10px}
+.footer a{color:rgba(255,255,255,0.65);text-decoration:none;font-weight:700}
+
+/* ── FREE SPIN FLASH ── */
+.freespin-flash{
+  display:none;position:fixed;inset:0;z-index:150;
+  background:rgba(0,0,0,0.7);align-items:center;justify-content:center;
+}
+.freespin-flash.show{display:flex;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.freespin-box{
+  background:linear-gradient(135deg,#1a0050,#0d0030);
+  border:4px solid #ffd700;border-radius:24px;
+  padding:30px 28px;text-align:center;max-width:340px;width:90%;
+  box-shadow:0 0 80px rgba(255,215,0,0.5),0 0 0 1px #0d0030,0 0 0 5px #8b6914;
+  animation:popIn .5s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{transform:scale(.5) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.fs-icon{font-size:72px;display:block;margin-bottom:8px;animation:bounce 1s ease infinite}
+@keyframes bounce{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.2) rotate(5deg)}}
+.fs-title{font-family:'Fredoka One',cursive;font-size:18px;letter-spacing:5px;color:#ffd700;text-shadow:0 0 15px rgba(255,215,0,0.6);margin-bottom:8px}
+.fs-amount{font-family:'Fredoka One',cursive;font-size:52px;color:#fff;text-shadow:0 0 30px rgba(255,215,0,0.8);line-height:1;margin-bottom:8px}
+.fs-sub{font-size:12px;color:#a090c0;line-height:1.6;margin-bottom:18px}
+.fs-btn{
+  display:block;width:100%;padding:15px;
+  background:linear-gradient(180deg,#fff8b0,#ffd700,#b08010);
+  border:none;border-radius:12px;
+  font-family:'Fredoka One',cursive;font-size:18px;letter-spacing:2px;
+  color:#0a0020;cursor:pointer;
+  box-shadow:0 6px 20px rgba(255,215,0,0.4);
+  margin-bottom:10px;text-decoration:none;
+  transition:transform .15s;
+}
+.fs-btn:hover{transform:scale(1.02)}
+.fs-timer{font-size:11px;color:rgba(255,255,255,0.45)}
+.fs-timer span{color:#ffd700;font-weight:700}
+
+/* confetti */
+.conf{position:fixed;width:8px;height:8px;top:-10px;border-radius:2px;animation:confFall linear forwards;pointer-events:none;z-index:300}
+@keyframes confFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* responsive */
+@media(max-width:500px){
+  .sym{font-size:24px;border-radius:10px}
+  .grid{gap:3px}
+  .grid-outer{padding:5px}
+  .spin-btn{width:76px;height:76px;font-size:38px}
+  .bet-btn{padding:7px 10px;font-size:12px}
+  .stats-bar{padding:6px 12px}
+  .stat-val{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<!-- FREE SPIN / BIG WIN OVERLAY -->
+<div class="freespin-flash" id="fsOverlay">
+  <div class="freespin-box">
+    <span class="fs-icon">🏆</span>
+    <div class="fs-title">BÜYÜK KAZANÇ!</div>
+    <div class="fs-amount" id="fsAmount">5.000 TL</div>
+    <div class="fs-sub">Tebrikler! Seni özel deneme bonusuna yönlendiriyoruz.<br><strong style="color:#f5e8c0">denemebonuscuyuz.com</strong>'da gerçek para kazan!</div>
+    <a href="/slot-git" class="fs-btn" id="fsBtn">💰 GERÇEK KAZANÇLAR İÇİN TIKLA!</a>
+    <div class="fs-timer">Otomatik yönlendirme: <span id="fsCountdown">5</span>s</div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="title-wrap">
+    <div class="title-main">Sweet Bonanza 2500</div>
+    <div class="title-sub">🍭 Demo Slot • Ücretsiz • Bonus Kazan</div>
+  </div>
+
+  <div class="machine-frame">
+    <!-- Multiplier badge -->
+    <div class="mult-area">
+      <div class="mult-badge" id="multBadge">×<span id="multVal">1</span></div>
+    </div>
+
+    <!-- Cascade win chips -->
+    <div class="cascade-info" id="cascadeInfo"></div>
+
+    <!-- 6×5 grid -->
+    <div class="grid-outer">
+      <div class="grid" id="grid"></div>
+    </div>
+
+    <!-- Win message -->
+    <div class="win-msg miss" id="winMsg" style="margin-top:8px">🍭 Çevir ve 8+ aynı sembolü bul!</div>
+
+    <div class="controls">
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-lbl">KREDİ</span>
+          <span class="stat-val" id="creditDisp">10.000</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <span class="stat-lbl">BAHİS</span>
+          <span class="stat-val" id="betDisp">20</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <span class="stat-lbl">KAZANÇ</span>
+          <span class="stat-val green" id="winDisp">0</span>
+        </div>
+      </div>
+
+      <div class="bet-bar">
+        <span class="bet-label">BAHİS:</span>
+        <div class="bet-buttons" id="betBtns">
+          <button class="bet-btn" onclick="setBet(20)">20</button>
+          <button class="bet-btn active" onclick="setBet(50)">50</button>
+          <button class="bet-btn" onclick="setBet(100)">100</button>
+          <button class="bet-btn" onclick="setBet(200)">200</button>
+          <button class="bet-btn" onclick="setBet(500)">500</button>
+        </div>
+      </div>
+
+      <div class="spin-row">
+        <button class="side-btn" id="autoBtn" onclick="toggleAuto()">OTOMAT<br>İK</button>
+        <button class="spin-btn" id="spinBtn" onclick="doSpin()">↻</button>
+        <button class="side-btn" onclick="doMaxBet()">MAKS<br>BAHİS</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Ücretsiz demo slot · Gerçek para içermez<br>
+    Bonus için → <a href="https://www.denemebonuscuyuz.com">denemebonuscuyuz.com</a> &nbsp;|&nbsp;
+    <a href="/">🎰 Klasik Slot</a><br>
+    18+ Sorumlu oynayın · Kumar bağımlılığı: 182
+  </div>
+</div>
+
+<script>
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const COLS = 6, ROWS = 5;
+
+/* ── SYMBOLS ── */
+const SYMS = [
+  { id:'heart',  e:'❤️',  cls:'s-heart',  val:50, w:3 },
+  { id:'pink',   e:'🍬',  cls:'s-pink',   val:40, w:3 },
+  { id:'grape',  e:'🍇',  cls:'s-grape',  val:30, w:4 },
+  { id:'apple',  e:'🍎',  cls:'s-apple',  val:25, w:5 },
+  { id:'blue',   e:'💙',  cls:'s-blue',   val:15, w:6 },
+  { id:'green',  e:'💚',  cls:'s-green',  val:15, w:6 },
+  { id:'banana', e:'🍌',  cls:'s-banana', val:10, w:8 },
+  { id:'scatter',e:'🍭',  cls:'s-scatter',val:0,  w:2, scatter:true },
+];
+
+/* ── STATE ── */
+let grid = [];      // grid[col][row] = sym
+let credit = 10000, bet = 50, spinCount = 0;
+let spinning = false, autoOn = false, autoTimer = null;
+
+/* ── HELPERS ── */
+function rndSym() {
+  const tot = SYMS.reduce((s,x)=>s+x.w,0);
+  let r = Math.random()*tot;
+  for(const s of SYMS){r-=s.w;if(r<=0)return s}
+  return SYMS[0];
+}
+function sym(id){return SYMS.find(s=>s.id===id)}
+function fmt(n){return Math.round(n).toLocaleString('tr-TR')}
+
+function setBet(v){
+  bet=v;
+  document.querySelectorAll('.bet-btn').forEach(b=>b.classList.toggle('active',parseInt(b.textContent)===v));
+  updDisplay(0);
+}
+function doMaxBet(){[20,50,100,200,500].reverse().find(v=>{if(v<=credit){setBet(v);return true}})}
+function updDisplay(win){
+  document.getElementById('creditDisp').textContent=fmt(credit);
+  document.getElementById('betDisp').textContent=fmt(bet);
+  document.getElementById('winDisp').textContent=win>0?'+'+fmt(win):fmt(win);
+}
+function setMsg(t,cls){const e=document.getElementById('winMsg');e.textContent=t;e.className='win-msg '+(cls||'miss')}
+
+/* ── BUILD DOM ── */
+function buildGrid(){
+  const g=document.getElementById('grid');g.innerHTML='';
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const cell=document.createElement('div');cell.className='gc';cell.id=`g${c}_${r}`;
+      const sym=document.createElement('div');sym.className='sym';
+      cell.appendChild(sym);g.appendChild(cell);
+    }
+  }
+}
+
+/* ── RENDER ── */
+function renderGrid(isNew=false){
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const cell=document.getElementById(`g${c}_${r}`);
+      const symEl=cell.querySelector('.sym');
+      const s=grid[c][r];
+      symEl.className='sym '+s.cls+(s.scatter?' scatter-glow':'');
+      symEl.textContent=s.e;
+      if(isNew){cell.classList.add('new-sym');setTimeout(()=>cell.classList.remove('new-sym'),500)}
+    }
+  }
+}
+
+function fillRandom(){
+  grid=[];
+  for(let c=0;c<COLS;c++){grid[c]=[];for(let r=0;r<ROWS;r++)grid[c][r]=rndSym()}
+}
+
+/* ── PLACE SYMBOLS (rigged helper) ── */
+function place(positions, symId){
+  for(const[c,r]of positions) grid[c][r]=sym(symId);
+}
+
+/* ── FIND CLUSTER WINS ── */
+function findWins(){
+  const cnt={}, pos={};
+  for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){
+    const s=grid[c][r];if(!s||s.scatter)continue;
+    cnt[s.id]=(cnt[s.id]||0)+1;
+    (pos[s.id]=pos[s.id]||[]).push([c,r]);
+  }
+  return Object.entries(cnt)
+    .filter(([id,n])=>n>=8)
+    .map(([id,n])=>({sym:sym(id),count:n,pos:pos[id]}));
+}
+
+/* ── WIN AMOUNT ── */
+function winAmt(wins, mult){
+  return wins.reduce((tot,w)=>{
+    // More symbols = bigger multiplier
+    const countMult = w.count>=18?20:w.count>=15?12:w.count>=12?7:w.count>=10?4:w.count>=9?2.5:1.5;
+    return tot + bet * w.sym.val * 0.015 * countMult * mult;
+  },0);
+}
+
+/* ── HIGHLIGHT WINNING CELLS ── */
+async function highlightWins(wins){
+  for(const w of wins){
+    for(const[c,r]of w.pos){
+      const s=document.getElementById(`g${c}_${r}`).querySelector('.sym');
+      s.classList.add('winning');
+    }
+  }
+  await sleep(700);
+  // Explode
+  for(const w of wins){
+    for(const[c,r]of w.pos){
+      const s=document.getElementById(`g${c}_${r}`).querySelector('.sym');
+      s.classList.remove('winning');s.classList.add('exploding');
+    }
+  }
+  await sleep(380);
+}
+
+/* ── CASCADE ── */
+function cascadeGrid(wins){
+  // Mark winning positions null
+  for(const w of wins)for(const[c,r]of w.pos)grid[c][r]=null;
+  // Drop remaining down & fill from top
+  for(let c=0;c<COLS;c++){
+    const col=grid[c].filter(s=>s!==null);
+    while(col.length<ROWS)col.unshift(rndSym());
+    grid[c]=col;
+  }
+}
+
+/* ── CHIP DISPLAY ── */
+function addChip(w, amt){
+  const ci=document.getElementById('cascadeInfo');
+  const chip=document.createElement('div');chip.className='win-chip';
+  chip.innerHTML=`<span class="chip-sym">${w.sym.e}</span> ${w.count}× <span class="chip-amt">+${fmt(amt)} TL</span>`;
+  ci.appendChild(chip);
+}
+
+/* ── MULT DISPLAY ── */
+const MULTS=[1,2,3,5,9,25,50,100,500,2500];
+let multIdx=0;
+function showMult(idx){
+  const v=MULTS[idx]||MULTS[MULTS.length-1];
+  const el=document.getElementById('multBadge');
+  const vEl=document.getElementById('multVal');
+  vEl.textContent=v;
+  el.classList.remove('show');
+  void el.offsetWidth; // reflow for re-animation
+  el.classList.add('show');
+}
+
+/* ══════════════════════════════════════════════════════
+   SCRIPTED SPIN OUTCOMES
+══════════════════════════════════════════════════════ */
+
+// SPIN 1: Near miss — 7 hearts (one short of 8)
+function setupSpin1(){
+  fillRandom();
+  // Ensure no accidental wins by normalizing common symbols
+  for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){
+    if(['scatter'].includes(grid[c][r].id))grid[c][r]=sym('banana');
+  }
+  // Place exactly 7 hearts — spread them
+  const heartPos=[[0,0],[1,1],[2,2],[3,0],[4,3],[5,1],[2,4]];
+  place(heartPos,'heart');
+  // Make sure no other symbol reaches 8
+  let cnts={};
+  for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){
+    const id=grid[c][r].id;if(id==='heart')continue;
+    cnts[id]=(cnts[id]||0)+1;
+    if(cnts[id]>=8)grid[c][r]=sym('banana');cnts['banana']=(cnts['banana']||0)+1;
+  }
+}
+
+// SPIN 2: Small cascade — 8 bananas, then 9 blues
+function setupSpin2(){
+  fillRandom();
+  const bananaPos=[[0,4],[1,4],[2,4],[3,4],[4,4],[5,4],[0,3],[1,3]]; // 8 bananas bottom rows
+  place(bananaPos,'banana');
+  // Force no accidental 8+ elsewhere
+  let cnts={banana:8};
+  for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){
+    const s=grid[c][r];
+    if(['banana'].includes(s.id)||bananaPos.some(([bc,br])=>bc===c&&br===r))continue;
+    cnts[s.id]=(cnts[s.id]||0)+1;
+    if(cnts[s.id]>=8)grid[c][r]=sym('banana');
+  }
+}
+
+// After spin2 banana cascade, fill second wave (9 greens)
+function setupSpin2Wave2(){
+  // After banana cascade, rebuild grid with 9 greens
+  // We already have some grid from cascade — override top rows
+  const greenPos=[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[0,1],[1,1],[2,1]];
+  place(greenPos,'green');
+}
+
+// SPIN 3: EPIC CASCADE
+// Wave 1: 12 hearts
+function setupSpin3Wave1(){
+  fillRandom();
+  const hPos=[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],
+               [0,1],[1,1],[2,1],[3,1],
+               [0,2],[1,2]];
+  place(hPos,'heart');
+  // Remove any accidental 8+ wins
+  let cnts={heart:12};
+  for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){
+    if(hPos.some(([hc,hr])=>hc===c&&hr===r))continue;
+    cnts[grid[c][r].id]=(cnts[grid[c][r].id]||0)+1;
+    if(cnts[grid[c][r].id]>=8)grid[c][r]=sym('banana');
+  }
+  // Add 2 scatters for excitement
+  grid[4][4]=sym('scatter');grid[5][4]=sym('scatter');
+}
+
+// After heart cascade, wave 2: 11 grapes appear at top
+function setupSpin3Wave2(){
+  const gPos=[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],
+               [0,1],[1,1],[2,1],[3,1],[4,1]];
+  place(gPos,'grape');
+  // Fill non-grape with guaranteed no 8+
+  let cnts={grape:11};
+  for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){
+    if(gPos.some(([gc,gr])=>gc===c&&gr===r))continue;
+    cnts[grid[c][r].id]=(cnts[grid[c][r].id]||0)+1;
+    if(cnts[grid[c][r].id]>=8)grid[c][r]=sym('banana');
+  }
+}
+
+// Wave 3: 14 pink candies + 3 scatters → triggers FREE SPIN overlay
+function setupSpin3Wave3(){
+  const pPos=[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],
+               [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],
+               [0,2],[1,2]];
+  place(pPos,'pink');
+  grid[2][2]=sym('scatter');grid[3][2]=sym('scatter');grid[4][2]=sym('scatter');
+}
+
+
+/* ══════════════════════════════════════════════════════
+   CASCADE ENGINE
+══════════════════════════════════════════════════════ */
+async function runCascade(totalWinRef){
+  let cascadeCount=0;
+  multIdx=0;
+
+  while(true){
+    const wins=findWins();
+    if(!wins.length) break;
+
+    // Show multiplier badge (cascade 2+)
+    if(cascadeCount>0){ multIdx=Math.min(multIdx+1,MULTS.length-1); showMult(multIdx); }
+
+    const mult=MULTS[multIdx];
+    const earned=winAmt(wins,mult);
+    totalWinRef.val+=earned;
+    credit+=earned;
+    updDisplay(totalWinRef.val);
+
+    // Add chips
+    for(const w of wins) addChip(w,winAmt([w],mult));
+
+    // Animate win
+    await highlightWins(wins);
+
+    // Cascade grid data
+    cascadeGrid(wins);
+    renderGrid(true);
+
+    setMsg(`🎰 Kombolar devam ediyor... +${fmt(totalWinRef.val)} TL`,cascadeCount===0?'good':'big');
+    await sleep(600);
+    cascadeCount++;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   MAIN SPIN
+══════════════════════════════════════════════════════ */
+async function doSpin(){
+  if(spinning)return;
+  if(credit<bet){setMsg('❌ Yetersiz kredi!','miss');return}
+
+  spinning=true;
+  credit-=bet;
+  spinCount++;
+  updDisplay(0);
+  document.getElementById('cascadeInfo').innerHTML='';
+  document.getElementById('multBadge').classList.remove('show');
+  multIdx=0;
+
+  const btn=document.getElementById('spinBtn');
+  btn.disabled=true;btn.classList.add('busy');btn.textContent='⌛';
+  document.querySelectorAll('.bet-btn,.side-btn').forEach(b=>b.disabled=true);
+  setMsg('🎰 Çekiliyor...','miss');
+
+  let totalWinRef={val:0};
+
+  /* ─ SPIN 1: Near miss ─ */
+  if(spinCount===1){
+    setupSpin1();
+    renderGrid(true);
+    await sleep(800);
+    const wins=findWins(); // should be 0
+    if(!wins.length){
+      setMsg('😅 7 ❤️ — Sadece bir tane daha lazım! Tekrar çevir!','miss');
+    }
+  }
+
+  /* ─ SPIN 2: Small cascade ─ */
+  else if(spinCount===2){
+    setupSpin2();
+    renderGrid(true);
+    await sleep(800);
+    await runCascade(totalWinRef);
+
+    // Force wave 2 after first cascade
+    if(totalWinRef.val<bet*5){
+      // manually trigger a second wave
+      setupSpin2Wave2();
+      renderGrid(true);
+      await sleep(500);
+      await runCascade(totalWinRef);
+    }
+
+    if(totalWinRef.val>0){
+      setMsg(`🎉 +${fmt(totalWinRef.val)} TL kazandın! Bir daha çevir!`,'good');
+    }
+  }
+
+  /* ─ SPIN 3+: EPIC CASCADE ─ */
+  else {
+    // Wave 1
+    setupSpin3Wave1();
+    renderGrid(true);
+    await sleep(800);
+
+    // Hearts win
+    {
+      const wins=findWins();
+      if(wins.length){
+        showMult(0);
+        const earned=winAmt(wins,1);
+        totalWinRef.val+=earned;credit+=earned;updDisplay(totalWinRef.val);
+        for(const w of wins)addChip(w,winAmt([w],1));
+        await highlightWins(wins);
+        cascadeGrid(wins);
+      }
+    }
+
+    // Wave 2: grapes
+    setupSpin3Wave2();
+    renderGrid(true);
+    await sleep(600);
+    setMsg('🔥 KOMBİNASYON! Çarpan artıyor...','big');
+
+    {
+      multIdx=1;showMult(multIdx);
+      const mult=MULTS[multIdx];
+      const wins=findWins();
+      if(wins.length){
+        const earned=winAmt(wins,mult);
+        totalWinRef.val+=earned;credit+=earned;updDisplay(totalWinRef.val);
+        for(const w of wins)addChip(w,winAmt([w],mult));
+        await highlightWins(wins);
+        cascadeGrid(wins);
+      }
+    }
+
+    // Wave 3: pink + scatters
+    setupSpin3Wave3();
+    renderGrid(true);
+    await sleep(600);
+    setMsg('🍭🍭🍭 FREE SPIN KAZANDI!','big');
+    await sleep(400);
+
+    {
+      multIdx=2;showMult(multIdx);
+      const mult=MULTS[multIdx];
+      const wins=findWins();
+      if(wins.length){
+        const earned=winAmt(wins,mult);
+        totalWinRef.val+=earned;credit+=earned;updDisplay(totalWinRef.val);
+        for(const w of wins)addChip(w,winAmt([w],mult));
+        await highlightWins(wins);
+        cascadeGrid(wins);
+      }
+    }
+
+    // Extra big mult display
+    multIdx=4;showMult(multIdx);
+    await sleep(700);
+    multIdx=6;showMult(multIdx);
+    await sleep(500);
+
+    setMsg(`🏆 BÜYÜK KAZANÇ! +${fmt(totalWinRef.val)} TL`,'big');
+
+    // Extra credit boost for drama
+    if(totalWinRef.val<bet*50){
+      const bonus=bet*50-totalWinRef.val;
+      totalWinRef.val+=bonus;credit+=bonus;updDisplay(totalWinRef.val);
+    }
+
+    // Trigger big win overlay
+    await sleep(1000);
+    launchConfetti();
+    document.getElementById('fsAmount').textContent='+'+fmt(totalWinRef.val)+' TL';
+    document.getElementById('fsOverlay').classList.add('show');
+    startCountdown();
+  }
+
+  spinning=false;
+  btn.disabled=false;btn.classList.remove('busy');btn.textContent='↻';
+  document.querySelectorAll('.bet-btn,.side-btn').forEach(b=>b.disabled=false);
+}
+
+/* ── AUTO ── */
+function toggleAuto(){
+  autoOn=!autoOn;
+  const btn=document.getElementById('autoBtn');
+  if(autoOn){
+    btn.textContent='AUTO\nAÇIK';btn.style.color='#ffd700';btn.style.borderColor='#ffd700';
+    autoTimer=setInterval(()=>{if(!spinning&&spinCount<3)doSpin();else if(spinCount>=3)toggleAuto()},2800);
+  }else{
+    btn.textContent='OTOMAT\nİK';btn.style.color='';btn.style.borderColor='';
+    clearInterval(autoTimer);
+  }
+}
+
+/* ── COUNTDOWN ── */
+function startCountdown(){
+  let s=5;const el=document.getElementById('fsCountdown');
+  const iv=setInterval(()=>{s--;el.textContent=s;if(s<=0){clearInterval(iv);window.location.href='/slot-git'}},1000);
+}
+
+/* ── CONFETTI ── */
+function launchConfetti(){
+  const cols=['#ffd700','#ff69b4','#e91e63','#9c27b0','#2196f3','#00bcd4','#fff'];
+  for(let i=0;i<150;i++)setTimeout(()=>{
+    const p=document.createElement('div');p.className='conf';
+    p.style.left=Math.random()*100+'vw';
+    p.style.background=cols[Math.floor(Math.random()*cols.length)];
+    p.style.width=(Math.random()*10+6)+'px';p.style.height=(Math.random()*10+6)+'px';
+    p.style.borderRadius=Math.random()>.5?'50%':'3px';
+    p.style.animationDuration=(Math.random()*2+1.5)+'s';
+    document.body.appendChild(p);setTimeout(()=>p.remove(),4000);
+  },i*18);
+}
+
+/* ── INIT ── */
+buildGrid();
+fillRandom();
+renderGrid();
+updDisplay(0);
+</script>
+</body>
+</html>
