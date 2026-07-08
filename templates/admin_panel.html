@@ -10,8 +10,8 @@ body{font-family:'Inter',sans-serif;background:#09090b;color:#fafafa;min-height:
 .topbar{background:#111115;border-bottom:1px solid #27272a;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
 .topbar h1{font-size:16px;font-weight:800;color:#f97316}
 .topbar-links{display:flex;gap:12px}
-.topbar-links a{font-size:13px;color:#94a3b8;text-decoration:none;font-weight:600}
-.topbar-links a:hover{color:#f97316}
+.topbar-links a{font-size:13px;color:#94a3b8;text-decoration:none;font-weight:600;padding:6px 10px;border-radius:6px;border:1px solid #27272a}
+.topbar-links a:hover{color:#f97316;border-color:#f97316}
 .wrap{max-width:900px;margin:0 auto;padding:24px 20px}
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
 .stat-card{background:#111115;border:1px solid #27272a;border-radius:12px;padding:16px;text-align:center}
@@ -50,7 +50,8 @@ tr:hover td{background:#111115}
   <h1>🔧 Admin Panel — denemebonusunuz.xyz</h1>
   <div class="topbar-links">
     <a href="/">Siteyi Gör</a>
-    <a href="/admin/seed">Örnek Veri</a>
+    <a href="/admin/istatistikler">📊 İstatistikler</a>
+    <a href="/admin/tiklama-listesi">🖱️ Tıklamalar</a>
     <a href="/admin/logout">Çıkış</a>
   </div>
 </div>
@@ -60,9 +61,10 @@ tr:hover td{background:#111115}
     {% if messages %}{% for m in messages %}<div class="flash">✓ {{ m }}</div>{% endfor %}{% endif %}
   {% endwith %}
 
-  <div class="stat-row">
+  <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat-card"><div class="stat-val">{{ total_clicks }}</div><div class="stat-lbl">Toplam Tıklama</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#22c55e">{{ slot_clicks }}</div><div class="stat-lbl">🎰 Slot → denemebonuscuyuz</div></div>
     <div class="stat-card"><div class="stat-val">{{ sites|length }}</div><div class="stat-lbl">Toplam Site</div></div>
-    <div class="stat-card"><div class="stat-val">{{ total_clicks }}</div><div class="stat-lbl">Toplam Tıklanma</div></div>
     <div class="stat-card"><div class="stat-val">{{ sites|selectattr('aktif')|list|length }}</div><div class="stat-lbl">Aktif Site</div></div>
   </div>
 

@@ -1,6 +1,9 @@
 import os
+import json
 import hashlib
 import datetime
+import threading
+import urllib.request as _urllib_req
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
@@ -19,6 +22,10 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 
+HEDEF_URL = "https://www.denemebonuscuyuz.com"
+
+
+# ─── MODELLER ──────────────────────────────────────────────────────────────
 
 class Site(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,59 +34,167 @@ class Site(db.Model):
     bonus_text = db.Column(db.String(200), nullable=False)
     promo_kod = db.Column(db.String(50), default="")
     affiliate_link = db.Column(db.String(300), nullable=False)
-    kategori = db.Column(db.String(50), default="onerilen")  # vip / onerilen / yeni
+    kategori = db.Column(db.String(50), default="onerilen")
     aktif = db.Column(db.Boolean, default=True)
     sira = db.Column(db.Integer, default=0)
     aciklama = db.Column(db.Text, default="")
 
-    def badge_label(self):
-        return {"vip": "⭐ VIP", "onerilen": "✓ ÖNERİLEN", "yeni": "🆕 YENİ"}.get(self.kategori, "")
-
-    def toplam_tiklanma(self):
-        return Click.query.filter_by(site_id=self.id).count()
-
 
 class Click(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    site_id = db.Column(db.Integer, db.ForeignKey("site.id"), nullable=False)
+    site_id = db.Column(db.Integer, db.ForeignKey("site.id"), nullable=True)
     tarih = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    ip_hash = db.Column(db.String(64), default="")
+    kaynak = db.Column(db.String(100), default="slot")    # slot / site / admin
+    user_agent = db.Column(db.String(300), default="")
+    ip_hash = db.Column(db.String(64), default="")        # SHA256(IP)
+    ip_kismi = db.Column(db.String(20), default="")       # 85.123.45.xxx
     referer = db.Column(db.String(500), default="")
-    cihaz = db.Column(db.String(20), default="")
+    cihaz = db.Column(db.String(20), default="")          # masaustu / mobil / tablet
+    sehir = db.Column(db.String(100), default="")
+    ulke = db.Column(db.String(100), default="")
 
 
-def get_device(ua):
-    ua = ua.lower()
-    if any(x in ua for x in ["mobile", "android", "iphone"]):
-        return "mobil"
-    elif "tablet" in ua or "ipad" in ua:
+# ─── DB KURULUM + MIGRATION ───────────────────────────────────────────────
+
+with app.app_context():
+    db.create_all()
+    try:
+        import sqlalchemy as _sa
+        with db.engine.connect() as _conn:
+            _inspector = _sa.inspect(db.engine)
+            if "click" in _inspector.get_table_names():
+                _click_cols = [c["name"] for c in _inspector.get_columns("click")]
+                for _col, _typ in [
+                    ("kaynak",     "VARCHAR(100)"),
+                    ("user_agent", "VARCHAR(300)"),
+                    ("ip_hash",    "VARCHAR(64)"),
+                    ("ip_kismi",   "VARCHAR(20)"),
+                    ("referer",    "VARCHAR(500)"),
+                    ("cihaz",      "VARCHAR(20)"),
+                    ("sehir",      "VARCHAR(100)"),
+                    ("ulke",       "VARCHAR(100)"),
+                ]:
+                    if _col not in _click_cols:
+                        _conn.execute(_sa.text(f"ALTER TABLE click ADD COLUMN {_col} {_typ} DEFAULT ''"))
+                        _conn.commit()
+            if "site" in _inspector.get_table_names():
+                _site_cols = [c["name"] for c in _inspector.get_columns("site")]
+                for _col, _typ in [
+                    ("promo_kod", "VARCHAR(50)"),
+                    ("aciklama",  "TEXT"),
+                ]:
+                    if _col not in _site_cols:
+                        _conn.execute(_sa.text(f"ALTER TABLE site ADD COLUMN {_col} {_typ} DEFAULT ''"))
+                        _conn.commit()
+    except Exception as _e:
+        print(f"Migration uyarısı: {_e}")
+
+
+# ─── YARDIMCI FONKSİYONLAR ───────────────────────────────────────────────
+
+def hash_ip(ip):
+    return hashlib.sha256((ip or "").encode()).hexdigest()[:16]
+
+
+def _ip_kismi(ip):
+    """IP'nin son oktetini gizle: 85.123.45.67 → 85.123.45.xxx"""
+    try:
+        parts = (ip or "").split(".")
+        if len(parts) == 4:
+            return ".".join(parts[:3]) + ".xxx"
+    except Exception:
+        pass
+    return ""
+
+
+def detect_device(ua_string):
+    ua = (ua_string or "").lower()
+    if any(x in ua for x in ["ipad", "tablet", "kindle"]):
         return "tablet"
+    if any(x in ua for x in ["mobile", "android", "iphone", "windows phone"]):
+        return "mobil"
     return "masaustu"
 
 
-# ─── Ana Sayfa (Slot Makinesi) ──────────────────────────────
+def geolocate_ip(ip):
+    """ip-api.com ücretsiz geolocation (lokal IP'leri atlar)"""
+    try:
+        if not ip or ip.startswith(("127.", "10.", "192.168.", "::1")):
+            return "", ""
+        url = f"http://ip-api.com/json/{ip}?fields=status,city,country&lang=tr"
+        with _urllib_req.urlopen(url, timeout=2) as resp:
+            data = json.loads(resp.read().decode())
+            if data.get("status") == "success":
+                return data.get("city", ""), data.get("country", "")
+    except Exception:
+        pass
+    return "", ""
+
+
+def log_click(kaynak="slot", site_id=None):
+    try:
+        ip = request.headers.get("X-Forwarded-For", request.remote_addr or "").split(",")[0].strip()
+        ua = request.user_agent.string if request.user_agent else ""
+        click = Click(
+            site_id=site_id,
+            kaynak=kaynak,
+            user_agent=ua[:300],
+            ip_hash=hash_ip(ip),
+            ip_kismi=_ip_kismi(ip),
+            referer=request.referrer[:500] if request.referrer else "",
+            cihaz=detect_device(ua),
+        )
+        db.session.add(click)
+        db.session.commit()
+        click_id = click.id
+
+        # Geolocation arka planda
+        def _geo():
+            try:
+                sehir, ulke = geolocate_ip(ip)
+                if sehir or ulke:
+                    with app.app_context():
+                        c = Click.query.get(click_id)
+                        if c:
+                            c.sehir = sehir
+                            c.ulke = ulke
+                            db.session.commit()
+            except Exception:
+                pass
+        threading.Thread(target=_geo, daemon=True).start()
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"log_click hata: {e}")
+
+
+# ─── ANA SAYFA (Slot Makinesi) ────────────────────────────────────────────
+
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
-# ─── Click Tracking ──────────────────────────────────────────
+# ─── SLOT MAKİNESİ YÖNLENDİRME ───────────────────────────────────────────
+
+@app.route("/slot-git")
+def slot_git():
+    """Slot makinesi kazanma → tıklama kaydet → denemebonuscuyuz.com"""
+    log_click(kaynak="slot")
+    return redirect(HEDEF_URL)
+
+
+# ─── SİTE BAZLI YÖNLENDİRME (eski sistem) ────────────────────────────────
+
 @app.route("/git/<int:site_id>")
 def git(site_id):
     site = Site.query.get_or_404(site_id)
-    ip = request.headers.get("X-Forwarded-For", request.remote_addr).split(",")[0].strip()
-    click = Click(
-        site_id=site.id,
-        ip_hash=hashlib.sha256(ip.encode()).hexdigest(),
-        referer=request.referrer or "",
-        cihaz=get_device(request.user_agent.string)
-    )
-    db.session.add(click)
-    db.session.commit()
+    log_click(kaynak=request.args.get("k", "site"), site_id=site.id)
     return redirect(site.affiliate_link)
 
 
-# ─── Admin ───────────────────────────────────────────────────
+# ─── ADMIN GİRİŞ ─────────────────────────────────────────────────────────
+
 @app.route("/admin", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
@@ -96,8 +211,124 @@ def admin_panel():
         return redirect(url_for("admin_login"))
     sites = Site.query.order_by(Site.kategori, Site.sira).all()
     total_clicks = Click.query.count()
-    return render_template("admin_panel.html", sites=sites, total_clicks=total_clicks)
+    slot_clicks  = Click.query.filter_by(kaynak="slot").count()
+    return render_template("admin_panel.html", sites=sites,
+                           total_clicks=total_clicks, slot_clicks=slot_clicks)
 
+
+# ─── ADMIN İSTATİSTİKLER ─────────────────────────────────────────────────
+
+@app.route("/admin/istatistikler")
+def admin_istatistikler():
+    if not session.get("admin"):
+        return redirect(url_for("admin_login"))
+    from sqlalchemy import func, distinct, extract
+    from urllib.parse import urlparse as _up
+
+    now = datetime.datetime.utcnow()
+    bugun = now.date()
+    dt_bugun = datetime.datetime(bugun.year, bugun.month, bugun.day)
+    dt_hafta = now - datetime.timedelta(days=7)
+    dt_30    = now - datetime.timedelta(days=30)
+
+    # ── Global özet ──────────────────────────────────────────────────────
+    global_bugun  = Click.query.filter(Click.tarih >= dt_bugun).count()
+    global_hafta  = Click.query.filter(Click.tarih >= dt_hafta).count()
+    global_toplam = Click.query.count()
+    slot_toplam   = Click.query.filter_by(kaynak="slot").count()
+
+    # ── Slot vs diğer (son 30 gün) ───────────────────────────────────────
+    kaynak_rows = db.session.query(
+        Click.kaynak, func.count(Click.id)
+    ).filter(Click.tarih >= dt_30).group_by(Click.kaynak).all()
+    kaynak_data = {(r[0] or "slot"): r[1] for r in kaynak_rows}
+
+    # ── Cihaz dağılımı ───────────────────────────────────────────────────
+    cihaz_rows = db.session.query(
+        Click.cihaz, func.count(Click.id)
+    ).filter(Click.tarih >= dt_30, Click.cihaz != "").group_by(Click.cihaz).all()
+    cihaz_data = {r[0]: r[1] for r in cihaz_rows}
+
+    # ── Son 14 günlük grafik ──────────────────────────────────────────────
+    gunluk = []
+    for i in range(13, -1, -1):
+        d = bugun - datetime.timedelta(days=i)
+        d_start = datetime.datetime(d.year, d.month, d.day)
+        d_end   = d_start + datetime.timedelta(days=1)
+        c = Click.query.filter(Click.tarih >= d_start, Click.tarih < d_end).count()
+        gunluk.append({"gun": d.strftime("%d/%m"), "sayi": c})
+
+    # ── Saatlik trafik ───────────────────────────────────────────────────
+    saat_rows = db.session.query(
+        extract('hour', Click.tarih).label('saat'), func.count(Click.id)
+    ).filter(Click.tarih >= dt_30).group_by('saat').order_by('saat').all()
+    saat_data  = {int(r[0]): r[1] for r in saat_rows}
+    saat_liste = [saat_data.get(h, 0) for h in range(24)]
+
+    # ── Şehir & ülke ─────────────────────────────────────────────────────
+    sehir_rows = db.session.query(
+        Click.sehir, func.count(Click.id).label("c")
+    ).filter(Click.tarih >= dt_30, Click.sehir != "", Click.sehir.isnot(None)
+    ).group_by(Click.sehir).order_by(func.count(Click.id).desc()).limit(10).all()
+    top_sehirler = [(r[0], r[1]) for r in sehir_rows]
+
+    ulke_rows = db.session.query(
+        Click.ulke, func.count(Click.id).label("c")
+    ).filter(Click.tarih >= dt_30, Click.ulke != "", Click.ulke.isnot(None)
+    ).group_by(Click.ulke).order_by(func.count(Click.id).desc()).limit(10).all()
+    top_ulkeler = [(r[0], r[1]) for r in ulke_rows]
+
+    # ── Top referer domainleri ────────────────────────────────────────────
+    ref_rows = db.session.query(
+        Click.referer, func.count(Click.id).label("c")
+    ).filter(Click.tarih >= dt_30, Click.referer != "").group_by(
+        Click.referer
+    ).order_by(func.count(Click.id).desc()).limit(100).all()
+    domain_counts = {}
+    for ref, cnt in ref_rows:
+        try:
+            parsed = _up(ref)
+            domain = parsed.netloc or parsed.path.split("/")[0]
+            domain = domain.replace("www.", "").lower()
+        except Exception:
+            domain = ref[:40]
+        domain_counts[domain] = domain_counts.get(domain, 0) + cnt
+    top_referrers = sorted(domain_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+
+    # ── Son tıklamalar ────────────────────────────────────────────────────
+    son_tiklamalar = Click.query.order_by(Click.tarih.desc()).limit(20).all()
+
+    return render_template(
+        "admin_istatistikler.html",
+        global_bugun=global_bugun, global_hafta=global_hafta,
+        global_toplam=global_toplam, slot_toplam=slot_toplam,
+        kaynak_data=kaynak_data, cihaz_data=cihaz_data,
+        gunluk=gunluk, saat_liste=saat_liste,
+        top_sehirler=top_sehirler, top_ulkeler=top_ulkeler,
+        top_referrers=top_referrers,
+        son_tiklamalar=son_tiklamalar,
+    )
+
+
+# ─── ADMIN TIK LAMA LİSTESİ ──────────────────────────────────────────────
+
+@app.route("/admin/tiklama-listesi")
+def admin_tiklama_listesi():
+    if not session.get("admin"):
+        return redirect(url_for("admin_login"))
+    sayfa = request.args.get("sayfa", 1, type=int)
+    per_page = 50
+    q = Click.query.order_by(Click.tarih.desc())
+    toplam = q.count()
+    tiklamalar = q.offset((sayfa - 1) * per_page).limit(per_page).all()
+    return render_template(
+        "admin_tiklama_listesi.html",
+        tiklamalar=tiklamalar,
+        sayfa=sayfa, per_page=per_page, toplam=toplam,
+    )
+
+
+# ─── ADMIN SİTE YÖNETİMİ ─────────────────────────────────────────────────
 
 @app.route("/admin/site/add", methods=["POST"])
 def admin_add_site():
@@ -158,63 +389,17 @@ def admin_logout():
     return redirect(url_for("index"))
 
 
-# ─── Statik Sayfalar ─────────────────────────────────────────
+# ─── STATİK SAYFALAR ─────────────────────────────────────────────────────
+
 @app.route("/gizlilik")
 def gizlilik():
     return render_template("gizlilik.html")
+
 
 @app.route("/iletisim")
 def iletisim():
     return render_template("iletisim.html")
 
-
-# ─── Seed Data ───────────────────────────────────────────────
-@app.route("/admin/seed")
-def seed():
-    if not session.get("admin"):
-        return redirect(url_for("admin_login"))
-    if Site.query.count() > 0:
-        flash("Veriler zaten mevcut")
-        return redirect(url_for("admin_panel"))
-    sites_data = [
-        {"name": "Betbom", "bonus_text": "250 Freespin + 1000 TL Çekim İmkânı", "promo_kod": "BETBOM500",
-         "affiliate_link": "https://www.denemebonuscuyuz.com", "kategori": "vip", "sira": 1,
-         "logo_url": "/static/images/betbom.png",
-         "aciklama": "Sweet Bonanza'da geçerli 250 deneme freespin! Bizzat test ettim, anında ödüyor."},
-        {"name": "Atlasbet", "bonus_text": "Sweet Bonanza 2500x — Deneme Bonusu", "promo_kod": "ATLAS300",
-         "affiliate_link": "https://www.denemebonuscuyuz.com", "kategori": "vip", "sira": 2,
-         "logo_url": "/static/images/atlasbet-bonus.webp",
-         "aciklama": "Pragmatic Play'in en popüler slotu Atlasbet'te. Çevrimsiz freespin fırsatı."},
-        {"name": "Bahisfair", "bonus_text": "Sınırsız Kazanç + Freespin Satın Alma", "promo_kod": "FAIR200",
-         "affiliate_link": "https://www.denemebonuscuyuz.com", "kategori": "onerilen", "sira": 3,
-         "logo_url": "/static/images/bahisfair-bonus.webp",
-         "aciklama": "26 yıldır Avrupa ve Türkiye'nin sektör lideri. Günlük 50 Milyon TL çekim imkânı."},
-        {"name": "Betzula", "bonus_text": "500 Freespin Deneme Bonusu", "promo_kod": "ZULA500",
-         "affiliate_link": "https://www.bedavaspin.com", "kategori": "onerilen", "sira": 4,
-         "logo_url": "/static/images/betzula-bonus.webp",
-         "aciklama": "Yeni üyelere özel yatırım şartsız 500 freespin! Slot oyunları devasa seçenek."},
-        {"name": "Luxbet", "bonus_text": "250 TL Deneme + 30 Freespin", "promo_kod": "LUX250",
-         "affiliate_link": "https://www.denemebonuscuyuz.com", "kategori": "onerilen", "sira": 5,
-         "logo_url": "/static/images/luxbet-bonus.webp",
-         "aciklama": "Premium site, VIP müşteri desteği. Freespin kazançları anında hesaba geçiyor."},
-        {"name": "Gameofbet", "bonus_text": "100 TL Deneme + 20 Freespin", "promo_kod": "GOB100",
-         "affiliate_link": "https://www.bedavaspin.com", "kategori": "yeni", "sira": 6,
-         "logo_url": "/static/images/gameofbet-bonus.webp",
-         "aciklama": "Yeni açılan site, agresif bonus kampanyaları. Kayıp iadesi %15."},
-        {"name": "Zenbet", "bonus_text": "175 TL + 35 Freespin", "promo_kod": "ZEN175",
-         "affiliate_link": "https://www.bedavaspin.com", "kategori": "yeni", "sira": 7,
-         "logo_url": "/static/images/zenbet-bonus.webp",
-         "aciklama": "Yeni üyelere özel hoşgeldin paketi. Minimum yatırım 50 TL."},
-    ]
-    for s in sites_data:
-        db.session.add(Site(**s))
-    db.session.commit()
-    flash("Örnek siteler eklendi")
-    return redirect(url_for("admin_panel"))
-
-
-with app.app_context():
-    db.create_all()
 
 if __name__ == "__main__":
     app.run(debug=False)
