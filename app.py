@@ -57,16 +57,10 @@ def get_device(ua):
     return "masaustu"
 
 
-# ─── Ana Sayfa ───────────────────────────────────────────────
+# ─── Ana Sayfa (Slot Makinesi) ──────────────────────────────
 @app.route("/")
 def index():
-    vip_sites = Site.query.filter_by(aktif=True, kategori="vip").order_by(Site.sira).all()
-    onerilen_sites = Site.query.filter_by(aktif=True, kategori="onerilen").order_by(Site.sira).all()
-    yeni_sites = Site.query.filter_by(aktif=True, kategori="yeni").order_by(Site.sira).all()
-    return render_template("index.html",
-                           vip_sites=vip_sites,
-                           onerilen_sites=onerilen_sites,
-                           yeni_sites=yeni_sites)
+    return render_template("index.html")
 
 
 # ─── Click Tracking ──────────────────────────────────────────
