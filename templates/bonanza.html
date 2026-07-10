@@ -17,6 +17,19 @@ html,body{
   -webkit-tap-highlight-color:transparent;
 }
 
+html::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url('https://images.alphacoders.com/873/thumb-1920-873679.jpg');
+  background-size:cover;
+  background-position:center top;
+  opacity:.07;
+  z-index:0;
+  pointer-events:none;
+  mix-blend-mode:luminosity;
+}
+
 /* candy stripe animated top/bottom borders */
 body::before,body::after{
   content:'';position:fixed;left:0;right:0;height:16px;z-index:100;
