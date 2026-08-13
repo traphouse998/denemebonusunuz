@@ -24,6 +24,14 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 
 HEDEF_URL = "https://www.denemebonuscuyuz.com"
 
+with app.app_context():
+    db.create_all()
+    try:
+        db.session.execute(db.text("ALTER TABLE click ALTER COLUMN site_id DROP NOT NULL"))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
 
 # ─── MODELLER ──────────────────────────────────────────────────────────────
 
@@ -141,9 +149,11 @@ def log_click(kaynak="slot", site_id=None):
     try:
         ip = request.headers.get("X-Forwarded-For", request.remote_addr or "").split(",")[0].strip()
         ua = request.user_agent.string if request.user_agent else ""
+        if site_id is not None and not isinstance(site_id, int):
+            site_id = None
         click = Click(
-            site_id=site_id,
-            kaynak=kaynak,
+            site_id=site_id if site_id else None,
+            kaynak=kaynak or "slot",
             user_agent=ua[:300],
             ip_hash=hash_ip(ip),
             ip_kismi=_ip_kismi(ip),
@@ -435,9 +445,15 @@ def iletisim():
     return render_template("iletisim.html")
 
 
+@app.route("/link")
+def linkpage():
+    log_click(kaynak="link-page")
+    return render_template("linkpage.html")
+
+
 @app.route("/bonanza")
 def bonanza():
-    log_click(None, "bonanza-slot")
+    log_click(kaynak="bonanza")
     return render_template("bonanza.html")
 
 
