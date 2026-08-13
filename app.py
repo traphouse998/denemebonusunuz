@@ -4,7 +4,7 @@ import hashlib
 import datetime
 import threading
 import urllib.request as _urllib_req
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 
@@ -448,7 +448,10 @@ def iletisim():
 @app.route("/link")
 def linkpage():
     log_click(kaynak="link-page")
-    return render_template("linkpage.html")
+    resp = make_response(render_template("linkpage.html"))
+    resp.headers["Cache-Control"] = "public, max-age=300, s-maxage=3600"
+    resp.headers["CDN-Cache-Control"] = "public, max-age=3600"
+    return resp
 
 
 @app.route("/bonanza")
