@@ -24,6 +24,14 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 
 HEDEF_URL = "https://www.denemebonuscuyuz.com"
 
+
+@app.before_request
+def _apex_redirect():
+    """denemebonuscuyuz.com (www'suz) bu servise düşerse slot sayfası göstermeden 301 ile www'ya gönder."""
+    host = request.host.split(":")[0].lower()
+    if host == "denemebonuscuyuz.com":
+        return redirect(f"{HEDEF_URL}{request.full_path.rstrip('?')}", code=301)
+
 with app.app_context():
     db.create_all()
     try:
